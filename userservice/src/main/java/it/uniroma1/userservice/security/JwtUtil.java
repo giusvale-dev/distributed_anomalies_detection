@@ -87,9 +87,11 @@ public class JwtUtil {
         claims.put("username", user.getUsername());
         claims.put("enabled", user.isEnabled());
         List<String> roles = new ArrayList<String>();
-        for(GrantedAuthority ga : user.getAuthorities()) {
-            if(ga != null) {
-                roles.add(ga.getAuthority());
+        if (user.getAuthorities() != null) {
+            for(GrantedAuthority ga : user.getAuthorities()) {
+                if(ga != null) {
+                    roles.add(ga.getAuthority());
+                }
             }
         }
 

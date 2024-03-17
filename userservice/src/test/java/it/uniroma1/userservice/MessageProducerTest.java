@@ -206,10 +206,6 @@ public class MessageProducerTest {
         assertThrows(InvalidInputParameter.class, () -> messageProducer.sendMessage(u));      
     }
 
-
-
-
-
     /**
      * Simulate a message consumer, and sand back the message received to the
      * direct exchange

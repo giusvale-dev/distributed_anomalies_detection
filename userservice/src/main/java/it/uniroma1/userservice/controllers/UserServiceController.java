@@ -19,15 +19,31 @@
 
 package it.uniroma1.userservice.controllers;
 
+import javax.validation.Valid;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import it.uniroma1.userservice.entities.ACK;
+import it.uniroma1.userservice.entities.User;
+import it.uniroma1.userservice.messaging.MessageProducer;
+
 @RestController
+@Validated
 public class UserServiceController {
 
+    @Autowired
+    private MessageProducer messageProducer;
 
     @GetMapping("/api/user/hello")
     @PreAuthorize("hasRole('SYSTEM_ADMINISTRATOR')")
@@ -38,7 +54,40 @@ public class UserServiceController {
         } catch(Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
-
     }
 
+    @PostMapping("/api/user/insert")
+    @PreAuthorize("hasRole('SYSTEM_ADMINISTRATOR')")
+    public ResponseEntity<String> insertUser(@Valid @RequestBody UserInsertModel userModel) {
+        try {
+            User u = userModel.toUser();
+            String response = messageProducer.sendMessage(u);
+            if (response != null) {
+                //ACK RECEIVED
+                ObjectMapper om = new ObjectMapper();
+                ACK<User> ack = om.readValue(response, new TypeReference<ACK<User>>() {});
+                if (ack != null) {
+                    if (ack.isSuccess()) {
+                        if (ack.getPayload() != null) {
+                            om = new ObjectMapper();
+                            String bodyResponse = om.writeValueAsString(u);
+                            return ResponseEntity.status(HttpStatus.OK).body(bodyResponse);    
+                        } else {
+                            return ResponseEntity.status(HttpStatus.OK).body("OK");    
+                        } 
+                    } else {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ack.getMessage());
+                    }
+                } else {
+                    //ERROR
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Can't complete the operation");
+                }
+            } else {
+                //REQUEST NOT PERFORMED
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("At the moment is not possible satisy the operation request");
+            }
+        } catch(Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
 }
