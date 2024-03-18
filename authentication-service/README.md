@@ -15,3 +15,4 @@ docker run --rm -d \
 ```
 
 compile and run!
+mvn clean install compile test

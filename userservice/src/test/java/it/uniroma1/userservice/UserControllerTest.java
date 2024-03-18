@@ -162,8 +162,7 @@ public class UserControllerTest {
 
 
         ResponseEntity<String> respEntity = restTemplate.exchange("http://localhost:" + port + "/api/user/insert", HttpMethod.POST, requestEntity, String.class);
-        assertEquals(HttpStatusCode.valueOf(200), respEntity.getStatusCode());
-        assertNotNull(respEntity.getBody());
+        assertEquals(HttpStatusCode.valueOf(401), respEntity.getStatusCode());
         
     }
 

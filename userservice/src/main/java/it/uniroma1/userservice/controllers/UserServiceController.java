@@ -57,7 +57,7 @@ public class UserServiceController {
     }
 
     @PostMapping("/api/user/insert")
-    @PreAuthorize("hasRole('SYSTEM_ADMINISTRATOR')")
+    @PreAuthorize("hasRole('SUPERADMIN')")
     public ResponseEntity<String> insertUser(@Valid @RequestBody UserInsertModel userModel) {
         try {
             User u = userModel.toUser();

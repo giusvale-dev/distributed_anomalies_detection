@@ -1,5 +1,10 @@
 # Getting Started
 
+To develop you need the container
+docker run --rm -d --name rabbitmq  -p 15672:15672 -p 5672:5672 rabbitmq:3-management
+
+mvn clean install compile test #Run the unit tests
+
 ### Reference Documentation
 For further reference, please consider the following sections:
 
