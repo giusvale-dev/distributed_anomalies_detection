@@ -208,6 +208,47 @@ public class UserControllerTest {
         assertEquals(HttpStatusCode.valueOf(401), respEntity.getStatusCode());
         
     }
+    @Test
+    public void editUserControllerByUnauthorizedUser() throws Exception {
+        
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+
+        // Create users with right roles
+        User superadmin = new User();
+        superadmin.setEmail("superadmin");
+        superadmin.setUsername("superadmin");
+        superadmin.setName("superadmin");
+        superadmin.setSurname("superadmin");
+        superadmin.setEnabled(true);
+        superadmin.setAuthorities(null);
+        
+        //Simulate the login with a valid JWT signature
+        String token = jwtUtil.generateToken(superadmin);
+        assertNotNull(token);
+        
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(token);
+
+        UserEditModel userToEdit = new UserEditModel(); //Simulate the object from the UI
+        String userId = "1";
+        userToEdit.setEmail("john.doe@gmail.com");
+        userToEdit.setName("John");
+        userToEdit.setSurname("Doe");
+        userToEdit.setUsername("john_doe");
+        userToEdit.setPassword(bCryptPasswordEncoder.encode("HelloWorld!123"));
+        userToEdit.setEnabled(true);
+        userToEdit.setRoles(null);
+
+        ObjectMapper ob = new ObjectMapper();
+        String jsonBody = ob.writeValueAsString(userToEdit.toUser());
+
+        HttpEntity requestEntity = new HttpEntity<>(jsonBody, headers);
+
+        ResponseEntity<String> respEntity = restTemplate.exchange("http://localhost:" + port + "/api/user/edit/" + userId, HttpMethod.POST, requestEntity, String.class);
+        assertEquals(HttpStatusCode.valueOf(401), respEntity.getStatusCode());
+        
+    }
 
 
       /**
