@@ -1,9 +1,14 @@
 # Getting Started
 
 To develop you need the container
+```bash
 docker run --rm -d --name rabbitmq  -p 15672:15672 -p 5672:5672 rabbitmq:3-management
-
+```
+# Install dependencies and run tests
+```bash
+cd userservice 
 mvn clean install compile test #Run the unit tests
+```
 
 ### Reference Documentation
 For further reference, please consider the following sections:
