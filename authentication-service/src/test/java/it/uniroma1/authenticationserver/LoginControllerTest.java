@@ -24,6 +24,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
@@ -36,6 +37,7 @@ import it.uniroma1.authenticationserver.repositories.UserRepository;
 import it.uniroma1.authenticationserver.security.JwtUtil;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("dev")
 public class LoginControllerTest {
 
     @LocalServerPort
