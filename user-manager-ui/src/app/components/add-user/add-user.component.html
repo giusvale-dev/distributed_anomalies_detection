@@ -1,0 +1,94 @@
+<div style="width: 1024px; height: 100px"></div>
+<div>
+  <p-card
+    title="create-user"
+    header="Create New User"
+    class="flex-1 flex align-items-center justify-content-center text-center"
+    [style]="{ width: '45rem' }"
+  >
+    <form
+      [formGroup]="addUserForm"
+      (ngSubmit)="onAddUser()"
+      class="flex flex-column align-items-center"
+    >
+      <div class="field py-2">
+        <p-floatLabel>
+          <input id="name" type="text" pInputText formControlName="name" />
+          <label for="name">Name</label>
+        </p-floatLabel>
+      </div>
+      <div class="field py-2">
+        <p-floatLabel>
+          <input
+            id="surname"
+            type="text"
+            pInputText
+            formControlName="surname"
+          />
+          <label for="surname">Surname</label>
+        </p-floatLabel>
+      </div>
+      <div class="field py-2">
+        <p-floatLabel>
+          <input
+            id="username"
+            type="text"
+            pInputText
+            formControlName="username"
+          />
+          <p-message *ngIf="!addUserForm.get('username')?.valid && addUserForm.get('username')?.touched " severity="error" text="Username is required"></p-message>
+          <label for="username">Username</label>
+          
+        </p-floatLabel>
+        
+      </div>
+      <div class="field py-2">
+        <p-floatLabel>
+          <input id="email" type="email" pInputText formControlName="email" />
+          <label for="email">Email</label>
+        </p-floatLabel>
+      </div>
+      <div class="field py-2">
+        <p-floatLabel>
+          <input
+            id="password"
+            type="password"
+            pInputText
+            formControlName="password"
+          />
+          <label for="password">Password</label>
+        </p-floatLabel>
+      </div>
+      <div class="field py-2">
+        <p-floatLabel>
+          <input
+            id="confirmPassword"
+            type="password"
+            pInputText
+            formControlName="confirmPassword"
+          />
+          <label for="confirmPassword">Confirm Password</label>
+        </p-floatLabel>
+      </div>
+      <div class="field py-2">
+        <span class="p-float-label">
+          <p-multiSelect
+            inputId="float-label"
+            [options]="roles"
+            formControlName="sel_roles"
+            optionLabel="value"
+            placeholder="Select Roles"
+          ></p-multiSelect>
+          <label for="float-label">Select Roles</label>
+        </span>
+      </div>
+      <div class="button py-5">
+        <p-button
+          label="Create User"
+          type="submit"
+          [disabled]="!addUserForm.valid"
+        ></p-button>
+      </div>
+    </form>
+  </p-card>
+</div>

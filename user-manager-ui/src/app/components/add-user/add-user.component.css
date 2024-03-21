@@ -1,0 +1,10 @@
+  
+#container  {
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    margin-top: -50px !important;
+    margin-left: -50px !important;
+    width: 30% !important;
+    height: 100px !important;
+}
