@@ -18,13 +18,17 @@ services:
       - "8082:8080"
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysqldb:3306/users
-      SPRING_DATASOURCE_USERNAME: user_admin
-      SPRING_DATASOURCE_PASSWORD: user_admin01$$
+      SPRING_DATASOURCE_USERNAME: admin-user
+      SPRING_DATASOURCE_PASSWORD: admin_user_password
       SPRING_APPLICATION_JSON: '{
         "spring.datasource.url"  : "jdbc:mysql://mysqldb:3306/users",
-        "spring.datasource.username" : "user_admin",
-        "spring.datasource.password" : "user_admin01$$",
-        "spring.jpa.hibernate.ddl-auto" : "update",
+        "spring.datasource.username" : "admin-user",
+        "spring.datasource.password" : "admin_user_password",
+        "spring.jpa.hibernate.ddl-auto" : "none",
+        "spring.jpa.database":"mysql",
+        "spring.datasource.initialization-mode":"always",
+        "spring.jpa.defer-datasource-initialization":"true",
+        "logging.level.org.hibernate.type.descriptor.sql.BasicBinder":"TRACE",
         "jwt.symmetric.key":"01234567890123456789012345678901"
         }'
     networks:
@@ -41,13 +45,17 @@ services:
       - "8083:8080"
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysqldb:3306/users
-      SPRING_DATASOURCE_USERNAME: user_admin
-      SPRING_DATASOURCE_PASSWORD: user_admin01$$
+      SPRING_DATASOURCE_USERNAME: admin-user
+      SPRING_DATASOURCE_PASSWORD: admin_user_password
       SPRING_APPLICATION_JSON: '{
         "spring.datasource.url"  : "jdbc:mysql://mysqldb:3306/users",
-        "spring.datasource.username" : "user_admin",
-        "spring.datasource.password" : "user_admin01$$",
-        "spring.jpa.hibernate.ddl-auto" : "update",
+        "spring.datasource.username" : "admin-user",
+        "spring.datasource.password" : "admin_user_password",
+        "spring.jpa.hibernate.ddl-auto" : "none",
+        "spring.jpa.database":"mysql",
+        "spring.datasource.initialization-mode":"always",
+        "spring.jpa.defer-datasource-initialization":"true",
+        "logging.level.org.hibernate.type.descriptor.sql.BasicBinder":"TRACE",
         "jwt.symmetric.key":"01234567890123456789012345678901"
         }'
     networks:
@@ -65,14 +73,22 @@ services:
     networks:
       - common-net
 
+  user-ui:
+    image: user-ui
+    build: ./user-manager-ui
+    ports:
+    - 80:4200
+    networks:
+      - common-net
+
   mysqldb:
     image: mysql:latest
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: user_admin01$$
+      MYSQL_ROOT_PASSWORD: root_password
       MYSQL_DATABASE: users
-      MYSQL_USER: user_admin
-      MYSQL_PASSWORD: user_admin01$$
+      MYSQL_USER: admin-user
+      MYSQL_PASSWORD: admin_user_password
       MYSQL_INITDB: /docker-entrypoint-initdb.d
     networks:
       - common-net

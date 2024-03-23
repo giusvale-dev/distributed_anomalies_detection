@@ -16,8 +16,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import it.uniroma1.authenticationserver.entities.User;
-import it.uniroma1.authenticationserver.repositories.UserRepository;
+import it.uniroma1.authenticationserver.entities.Member;
+import it.uniroma1.authenticationserver.repositories.MemberRepository;
 
 @Component
 public class CustomAuth implements AuthenticationProvider {
@@ -25,14 +25,15 @@ public class CustomAuth implements AuthenticationProvider {
     Logger logger = LoggerFactory.getLogger(CustomAuth.class);
 
     @Autowired
-    private UserRepository userRepository;
+    private MemberRepository userRepository;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         logger.info("authenticate");
         
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-        User u = userRepository.findByUsername(authentication.getName());
+        Member u = userRepository.findByUsername(authentication.getName());
+        logger.info(u.getUsername());
         //Check same password in DB
         if( u != null && u.getUsername() != null &&
             bCryptPasswordEncoder.matches(authentication.getCredentials().toString(), u.getPassword()) 

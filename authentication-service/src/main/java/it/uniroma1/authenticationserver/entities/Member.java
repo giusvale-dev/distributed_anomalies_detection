@@ -15,7 +15,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Table;
+
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,8 +25,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "application_users")
-public class User implements UserDetails{
+public class Member implements UserDetails{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,11 +51,11 @@ public class User implements UserDetails{
     
     @ManyToMany
     @JoinTable(
-        name = "user_role",
-        joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns = {@JoinColumn(name = "role_id")}
+        name = "member_authority",
+        joinColumns = @JoinColumn(name = "member_id"),
+        inverseJoinColumns = {@JoinColumn(name = "authority_id")}
     )
-    private Set<Role> authorities;
+    private Set<Authority> authorities;
 
     @Override
     public boolean isEnabled() {

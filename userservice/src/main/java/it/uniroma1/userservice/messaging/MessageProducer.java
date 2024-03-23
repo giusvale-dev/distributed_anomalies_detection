@@ -43,16 +43,21 @@ public class MessageProducer {
     @Value("${binding.rabbitmq.key}")
     private String keyBinding;
 
-    public String sendMessage(User user) throws InvalidInputParameter, JsonProcessingException {
-        boolean isValidUser = userValidator(user);
-        if(isValidUser) {
-            ObjectMapper om = new ObjectMapper();
-            String jsonMessage = om.writeValueAsString(user);
-            String response = (String) rabbitTemplate.convertSendAndReceive(directExchange.getName(), keyBinding, jsonMessage);
-            return response;
+    public String sendMessage(MessagePayload payload) throws InvalidInputParameter, JsonProcessingException {
+        if(payload != null) {     
+            boolean isValidUser = userValidator(payload.getUser());
+            if(isValidUser) {
+                ObjectMapper om = new ObjectMapper();
+                String jsonMessage = om.writeValueAsString(payload);
+                String response = (String) rabbitTemplate.convertSendAndReceive(directExchange.getName(), keyBinding, jsonMessage);
+                return response;
+            } else {
+                throw new InvalidInputParameter("User is not valid");
+            }
         } else {
-            throw new InvalidInputParameter("User is not valid");
+            throw new InvalidInputParameter("Payload is not valid");
         }
+
     }
 
     private boolean userValidator(User u) {

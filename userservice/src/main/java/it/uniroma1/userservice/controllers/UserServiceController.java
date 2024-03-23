@@ -26,6 +26,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,7 +36,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import it.uniroma1.userservice.entities.ACK;
+import it.uniroma1.userservice.entities.OperationType;
 import it.uniroma1.userservice.entities.User;
+import it.uniroma1.userservice.messaging.MessagePayload;
 import it.uniroma1.userservice.messaging.MessageProducer;
 
 @RestController
@@ -56,12 +59,14 @@ public class UserServiceController {
         }
     }
 
+    @CrossOrigin
     @PostMapping("/api/user/insert")
     @PreAuthorize("hasRole('SUPERADMIN')")
     public ResponseEntity<String> insertUser(@Valid @RequestBody UserInsertModel userModel) {
         try {
             User u = userModel.toUser();
-            String response = messageProducer.sendMessage(u);
+            MessagePayload mp = new MessagePayload(OperationType.INSERT, u);
+            String response = messageProducer.sendMessage(mp);
             if (response != null) {
                 //ACK RECEIVED
                 ObjectMapper om = new ObjectMapper();
@@ -73,7 +78,7 @@ public class UserServiceController {
                             String bodyResponse = om.writeValueAsString(u);
                             return ResponseEntity.status(HttpStatus.OK).body(bodyResponse);    
                         } else {
-                            return ResponseEntity.status(HttpStatus.OK).body("OK");    
+                            return ResponseEntity.status(HttpStatus.OK).body("{ 'response' : 'OK'}");    
                         } 
                     } else {
                         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ack.getMessage());
@@ -84,7 +89,7 @@ public class UserServiceController {
                 }
             } else {
                 //REQUEST NOT PERFORMED
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("At the moment is not possible satisy the operation request");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("At the moment is not possible satisfy the operation request");
             }
         } catch(Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());

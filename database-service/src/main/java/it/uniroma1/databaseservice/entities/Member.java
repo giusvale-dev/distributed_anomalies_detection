@@ -18,9 +18,12 @@
  */
 
 
-package it.uniroma1.databaseservice.entitis;
+package it.uniroma1.databaseservice.entities;
 
 import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -30,7 +33,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -39,8 +41,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "application_users")
-public class User {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class Member {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -66,9 +68,10 @@ public class User {
     
     @ManyToMany
     @JoinTable(
-        name = "user_role",
-        joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns = {@JoinColumn(name = "role_id")}
+        name = "member_authority",
+        joinColumns = @JoinColumn(name = "member_id"),
+        inverseJoinColumns = {@JoinColumn(name = "authority_id")}
     )
-    private Set<Role> authorities;
+    private Set<Authority> authorities;
+
 }

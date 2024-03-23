@@ -1,5 +1,8 @@
 <div style="width: 1024px; height: 100px"></div>
 <div>
+  <div [ngClass]="{ 'error': showError }">
+    <p>{{ errorMessage }}</p>
+  </div>
   <p-card
     title="create-user"
     header="Login"
@@ -20,7 +23,6 @@
             formControlName="username"
            
           />
-          <!--  <p-message *ngIf="!signinForm.get('username')?.valid"></p-message> -->
           <label for="username">Username</label>
         </p-floatLabel>
       </div>
@@ -37,7 +39,7 @@
       </div>
       <div class="button py-5">
         <p-button
-          label="Create User"
+          label="Login"
           type="submit"
           [disabled]="!signinForm.valid"
         ></p-button>

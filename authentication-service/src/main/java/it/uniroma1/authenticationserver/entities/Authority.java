@@ -6,12 +6,12 @@ package it.uniroma1.authenticationserver.entities;
 
 import java.util.Set;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,20 +22,21 @@ import lombok.Setter;
 @Setter
 @Getter
 @Entity
-public class Role implements IRole{
+public class Authority implements IRole{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String authority;
+    @Column(name = "authority_name")
+    private String authorityName;
 
     @ManyToMany(mappedBy = "authorities")
-    private Set<User> users;
+    private Set<Member> members;
 
     @Override
     public String getAuthority() {
-        return this.authority;
+        return this.authorityName;
     }
 
 }

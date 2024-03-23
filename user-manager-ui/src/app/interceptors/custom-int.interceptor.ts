@@ -13,7 +13,7 @@ export class CustomIntInterceptor implements HttpInterceptor {
   constructor() {}
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
-    const token  = localStorage.getItem('JWT');
+    const token  = localStorage.getItem('jwt');
     const newCloneReq = request.clone({
       setHeaders:{
         Authorization: `Bearer ${token}`

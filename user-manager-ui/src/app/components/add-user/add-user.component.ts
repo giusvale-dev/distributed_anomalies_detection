@@ -1,7 +1,11 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { environment } from '../../../environment/environment';
+import { HeadingPageComponent } from '../../heading-page/heading-page.component';
+import { Observable, catchError } from 'rxjs';
+
 
 
  
@@ -17,30 +21,48 @@ interface Roles {
 export class AddUserComponent {
   
   addUserForm!: FormGroup;
-
+  title: string;
   roles!: Roles[] ;
+  message: string;
+  severity: string;
 
 
   constructor(private http: HttpClient, private router: Router){
   }
 
-  onAddUser(){
+  onAddUser() {
 
-    
-      localStorage.setItem('JWT', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4iLCJzdXJuYW1lIjoiRG9lIiwidXNlcm5hbWUiOiJqZG9lIiwiZW1haWwiOiJqZG9lQGVtYWlsLmNvbSIsImVuYWJsZWQiOnRydWUsInJvbGVzIjpbIlJPTEVfU1VQRVJVU0VSIiwiUk9MRV9TWVNURU1fQURNSU5JU1RSQVRPUiJdLCJpYXQiOjE1MTYyMzkwMjJ9.OVtTGLNGddvLkvWTwptQuLU9zLXxgTKHphGYR4wO5IM');
-      this.http.post('https://7c2ba1b2-2c32-40ca-993c-50eabc33c918.mock.pstmn.io', this.addUserForm.value).subscribe((res:any)=>{
-        if(res.result){
-          alert('created user');
-          this.router.navigateByUrl('/addUser');
+      
+      this.addUserForm.removeControl("confirmPassword");
+
+      this.addUser(this.addUserForm).subscribe( { 
+      
+        next: (data: any) => {
+          console.log(data)
+          this.message = "User insert done"
+          this.severity = 'info';
           
-        } else{
-          alert(res.message);
-        }
-      })
-    
+        },
+        error: (err) => {
+          console.log(err);
+          this.message = err.error;
+          this.severity = 'error';
+        }})
+        this.router.navigateByUrl('/users/add')
+  }
+
+  addUser(addUserForm: FormGroup): Observable<any>{
+    const httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+    };
+    const addUserUrl = environment.addUser;
+    return this.http.post(addUserUrl,addUserForm.value, httpOptions);
   }
 
   ngOnInit() {
+
+    this.title = "Create user page"
+    
     this.roles= [
       {label: "ScAdmin", value: "Security Administrator"},
       {label: "User", value: "User"},
@@ -52,7 +74,8 @@ export class AddUserComponent {
       email: new FormControl("", [Validators.required, Validators.email]),
       password: new FormControl("", Validators.required),
       confirmPassword: new FormControl("",Validators.required),
-      sel_roles: new FormControl("",Validators.required)
+      sel_roles: new FormControl(""),
+      enabled: new FormControl(true, Validators.required)
     })
   }
 

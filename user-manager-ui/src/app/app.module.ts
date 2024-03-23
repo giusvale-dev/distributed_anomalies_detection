@@ -20,6 +20,11 @@ import { UserValidatorDirective } from './directives/user-validator.directive';
 import { EditUserComponent } from './components/edit-user/edit-user.component';
 import { UsersComponent } from './components/users/users.component';
 import { SigninComponent } from './components/signin/signin.component';
+import { MenuBarComponent } from './components/menu-bar/menu-bar.component';
+import { MenubarModule } from 'primeng/menubar';
+import {CheckboxModule} from 'primeng/checkbox';
+import { HeadingPageComponent } from './heading-page/heading-page.component';
+
 
 
 
@@ -30,7 +35,9 @@ import { SigninComponent } from './components/signin/signin.component';
     UserValidatorDirective,
     EditUserComponent,
     UsersComponent,
-    SigninComponent
+    SigninComponent,
+    MenuBarComponent,
+    HeadingPageComponent,
   ],
   imports: [
     BrowserModule,
@@ -45,7 +52,9 @@ import { SigninComponent } from './components/signin/signin.component';
     BrowserAnimationsModule,
     FloatLabelModule,
     MessagesModule,
-    MessageModule
+    MessageModule,
+    MenubarModule,
+    CheckboxModule,
     
   ],
   providers: [

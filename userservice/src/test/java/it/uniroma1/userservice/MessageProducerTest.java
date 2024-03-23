@@ -38,8 +38,10 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import it.uniroma1.userservice.entities.ACK;
+import it.uniroma1.userservice.entities.OperationType;
 import it.uniroma1.userservice.entities.Role;
 import it.uniroma1.userservice.entities.User;
+import it.uniroma1.userservice.messaging.MessagePayload;
 import it.uniroma1.userservice.messaging.MessageProducer;
 
 @SpringBootTest
@@ -70,7 +72,9 @@ public class MessageProducerTest {
         roles.add(r2);
         u.setAuthorities(roles);
 
-        String response = messageProducer.sendMessage(u);
+        MessagePayload mp = new MessagePayload(OperationType.INSERT, u);
+
+        String response = messageProducer.sendMessage(mp);
         assertNotNull(response);
 
         //Convert the response to a User
@@ -116,7 +120,8 @@ public class MessageProducerTest {
         roles.add(r1);
         roles.add(r2);
         u.setAuthorities(roles);
-        assertThrows(InvalidInputParameter.class, () -> messageProducer.sendMessage(u));      
+        MessagePayload mp = new MessagePayload(OperationType.INSERT, u);
+        assertThrows(InvalidInputParameter.class, () -> messageProducer.sendMessage(mp));      
     }
 
     @Test
@@ -138,7 +143,8 @@ public class MessageProducerTest {
         roles.add(r1);
         roles.add(r2);
         u.setAuthorities(roles);
-        assertThrows(InvalidInputParameter.class, () -> messageProducer.sendMessage(u));      
+        MessagePayload mp = new MessagePayload(OperationType.INSERT, u);
+        assertThrows(InvalidInputParameter.class, () -> messageProducer.sendMessage(mp));      
     }
 
     @Test
@@ -159,7 +165,8 @@ public class MessageProducerTest {
         roles.add(r1);
         roles.add(r2);
         u.setAuthorities(roles);
-        assertThrows(InvalidInputParameter.class, () -> messageProducer.sendMessage(u));      
+        MessagePayload mp = new MessagePayload(OperationType.INSERT, u);
+        assertThrows(InvalidInputParameter.class, () -> messageProducer.sendMessage(mp));      
     }
 
     @Test
@@ -181,7 +188,8 @@ public class MessageProducerTest {
         roles.add(r1);
         roles.add(r2);
         u.setAuthorities(roles);
-        assertThrows(InvalidInputParameter.class, () -> messageProducer.sendMessage(u));      
+        MessagePayload mp = new MessagePayload(OperationType.INSERT, u);
+        assertThrows(InvalidInputParameter.class, () -> messageProducer.sendMessage(mp));      
     }
 
     @Test
@@ -203,7 +211,8 @@ public class MessageProducerTest {
         roles.add(r1);
         roles.add(r2);
         u.setAuthorities(roles);
-        assertThrows(InvalidInputParameter.class, () -> messageProducer.sendMessage(u));      
+        MessagePayload mp = new MessagePayload(OperationType.INSERT, u);
+        assertThrows(InvalidInputParameter.class, () -> messageProducer.sendMessage(mp));      
     }
 
     /**
@@ -223,10 +232,11 @@ public class MessageProducerTest {
 
         ACK<User> replyMessage = new ACK<>();
         ObjectMapper om = new ObjectMapper();
-        User u = (User) om.readValue(message, User.class);
+        MessagePayload mp = (MessagePayload) om.readValue(message, MessagePayload.class);
+        assertNotNull(mp);
 
         replyMessage.setMessage("Ok");
-        replyMessage.setPayload(u);
+        replyMessage.setPayload(mp.getUser());
         replyMessage.setSuccess(true);
 
         String response = om.writeValueAsString(replyMessage);

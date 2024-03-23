@@ -30,8 +30,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import it.uniroma1.databaseservice.entitis.models.UserUI;
-import it.uniroma1.databaseservice.repositories.UserRepository;
+import it.uniroma1.databaseservice.entities.models.UserUI;
+import it.uniroma1.databaseservice.repositories.MemberRepository;
 
 @SpringBootTest
 @ActiveProfiles("dev")
@@ -39,7 +39,7 @@ public class UserRepositoryTest {
 
 
     @Autowired
-    private UserRepository userRepository;
+    private MemberRepository userRepository;
 
     @Test
     public void loadUsersTest() {

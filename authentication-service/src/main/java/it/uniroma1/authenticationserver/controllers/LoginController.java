@@ -13,11 +13,14 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import it.uniroma1.authenticationserver.entities.Role;
-import it.uniroma1.authenticationserver.entities.User;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import it.uniroma1.authenticationserver.entities.Authority;
+import it.uniroma1.authenticationserver.entities.Member;
 import it.uniroma1.authenticationserver.security.CustomAuth;
 import it.uniroma1.authenticationserver.security.JwtUtil;
 
@@ -41,6 +44,7 @@ public class LoginController {
      * @param password The password
      * @return the JWT Token if the user is authenticated
      */
+    @CrossOrigin
     @PostMapping("/api/login")
     public ResponseEntity<String> login(@RequestParam String username, @RequestParam String password) {
 
@@ -49,17 +53,19 @@ public class LoginController {
             Authentication authentication = new UsernamePasswordAuthenticationToken(username, password);
             authentication = customAuth.authenticate(authentication);
             if(authentication != null) {
-              User u = new User();
+              Member u = new Member();
               u.setUsername(authentication.getName());
-              Set<Role> roles = new HashSet<Role>();
+              Set<Authority> roles = new HashSet<Authority>();
               for(GrantedAuthority ga : authentication.getAuthorities()) {
-                roles.add((Role) ga);
+                roles.add((Authority) ga);
               }
               u.setEnabled(true); //The authentication is done, the user is enabled to login
               u.setAuthorities(roles);
               String token = jwtUtil.generateToken(u);
               if(token != null) {
-                return ResponseEntity.status(HttpStatus.OK).body(token);
+                ObjectMapper mapper = new ObjectMapper();
+                TokenModel t = new TokenModel(token);
+                return ResponseEntity.status(HttpStatus.OK).body(mapper.writeValueAsString(t));
               } else {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Problem during the generation of JWT token");
               }

@@ -25,21 +25,21 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import it.uniroma1.databaseservice.entitis.User;
-import it.uniroma1.databaseservice.entitis.models.UserUI;
+import it.uniroma1.databaseservice.entities.Member;
+import it.uniroma1.databaseservice.entities.models.UserUI;
 
-public interface UserRepository extends JpaRepository<User, Long>{
+public interface MemberRepository extends JpaRepository<Member, Long>{
 
-    @Query("SELECT NEW it.uniroma1.databaseservice.entitis.models.UserUI(u.id, u.username, u.email, u.name, u.surname, u.enabled) " +
-            "FROM User u " +
+    @Query("SELECT NEW it.uniroma1.databaseservice.entities.models.UserUI(u.id, u.username, u.email, u.name, u.surname, u.enabled) " +
+            "FROM Member u " +
             "WHERE u.username LIKE %?1% " +
             "   OR u.email LIKE %?1% " +
             "   OR u.name LIKE %?1% " +
             "   OR u.surname LIKE %?1%")
     public List<UserUI> searchUsers(String queryString);
 
-    public User findByUsername(String username);
+    public Member findByUsername(String username);
 
-    public User findById(long id);
+    public Member findById(long id);
 
 }

@@ -4,6 +4,8 @@ import { AddUserComponent } from './components/add-user/add-user.component';
 import { EditUserComponent } from './components/edit-user/edit-user.component';
 import { UsersComponent } from './components/users/users.component';
 import { SigninComponent } from './components/signin/signin.component';
+import { AuthGuard } from './auth/auth.guard';
+
 
 const routes: Routes = [
   
@@ -13,16 +15,25 @@ const routes: Routes = [
   },
   {
     path: 'users',
-    component: UsersComponent
+    component: UsersComponent,
+    canActivate: [AuthGuard]
   },
   {
     path: 'users/add',
-    component: AddUserComponent
+    component: AddUserComponent,
+    canActivate: [AuthGuard]
   },
   {
     path: 'users/edit',
-    component: EditUserComponent
+    component: EditUserComponent,
+    canActivate: [AuthGuard]
   },
+  {
+    path: 'logout',
+    component: SigninComponent
+    
+  },
+
   {
     path: '',
     redirectTo: 'signin',
@@ -30,7 +41,6 @@ const routes: Routes = [
   }
 
   
-
 
 ];
 

@@ -17,26 +17,22 @@
  *SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+package it.uniroma1.userservice.messaging;
 
-package it.uniroma1.databaseservice.entitis.models;
-
+import it.uniroma1.userservice.entities.OperationType;
+import it.uniroma1.userservice.entities.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
-public class UserUI {
+@AllArgsConstructor
+@NoArgsConstructor
+public class MessagePayload {
 
-    private Long id;
-    private String username;
-    private String email;
-    private String name;
-    private String surname;
-    private boolean enabled;
-
-
+    private OperationType operationType;
+    private User user;
+    
 }

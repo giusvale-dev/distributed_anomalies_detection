@@ -1,5 +1,6 @@
-<div style="width: 1024px; height: 100px"></div>
-<div>
+<app-menu-bar></app-menu-bar>
+<app-heading-page [title]="title"></app-heading-page>
+<p-message class="flex-1 flex align-items-center justify-content-center text-center" [hidden]="message==null" [severity]="severity" [text]="message"></p-message>
   <p-card
     title="create-user"
     header="Create New User"
@@ -13,7 +14,7 @@
     >
       <div class="field py-2">
         <p-floatLabel>
-          <input id="name" type="text" pInputText formControlName="name" />
+          <input id="name" type="text" pInputText formControlName="name" required="required"/>
           <label for="name">Name</label>
         </p-floatLabel>
       </div>
@@ -24,6 +25,7 @@
             type="text"
             pInputText
             formControlName="surname"
+            required="required"
           />
           <label for="surname">Surname</label>
         </p-floatLabel>
@@ -35,8 +37,8 @@
             type="text"
             pInputText
             formControlName="username"
+            required="required"
           />
-          <p-message *ngIf="!addUserForm.get('username')?.valid && addUserForm.get('username')?.touched " severity="error" text="Username is required"></p-message>
           <label for="username">Username</label>
           
         </p-floatLabel>
@@ -44,7 +46,7 @@
       </div>
       <div class="field py-2">
         <p-floatLabel>
-          <input id="email" type="email" pInputText formControlName="email" />
+          <input id="email" type="email" pInputText formControlName="email" required="required"/>
           <label for="email">Email</label>
         </p-floatLabel>
       </div>
@@ -55,6 +57,7 @@
             type="password"
             pInputText
             formControlName="password"
+            required="required"
           />
           <label for="password">Password</label>
         </p-floatLabel>
@@ -66,9 +69,15 @@
             type="password"
             pInputText
             formControlName="confirmPassword"
+            required="required"
           />
           <label for="confirmPassword">Confirm Password</label>
         </p-floatLabel>
+      </div>
+      <div class="field py-2">
+        <span><label for="enabled">User enabled </label>
+        <p-checkbox formControlName="enabled" [binary]="true"></p-checkbox>
+        </span>
       </div>
       <div class="field py-2">
         <span class="p-float-label">
@@ -91,4 +100,4 @@
       </div>
     </form>
   </p-card>
-</div>
+

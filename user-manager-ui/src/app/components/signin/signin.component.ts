@@ -3,6 +3,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../auth/auth.service';
 import { Router } from '@angular/router';
 
+
 @Component({
   selector: 'app-signin',
   templateUrl: './signin.component.html',
@@ -10,11 +11,18 @@ import { Router } from '@angular/router';
 })
 export class SigninComponent {
   signinForm: FormGroup;
+  showError = false;
+  errorMessage = '';
 
 
   constructor(private authService: AuthService, private router: Router) {}
 
   ngOnInit() {
+
+    if(localStorage.getItem('jwt') !== null) {
+      localStorage.clear();
+    }
+
     this.signinForm = new FormGroup({
       username: new FormControl('',[Validators.required]),
       password: new FormControl('',[Validators.required])
@@ -26,14 +34,15 @@ export class SigninComponent {
     const username = form.value.username
     const password = form.value.password
 
-    this.authService.signIn(username, password).subscribe({ next: (data: any) => {
-
-      this.authService.createUser(data.id, data.username, data.token)
-      localStorage.setItem('user', JSON.stringify(this.authService.user))
-      this.router.navigateByUrl('/users')
-    },
+    this.authService.signIn(username, password).subscribe( { 
+      
+      next: (data: any) => {
+        localStorage.setItem('jwt', data.jwt)
+        this.router.navigateByUrl('/users')
+      },
       error: (err) => {
-        console.log(err.error.message)
+        this.showError = true;
+        this.errorMessage = 'Username/Password not valid';
       }})
     
   }

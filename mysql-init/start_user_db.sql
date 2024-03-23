@@ -15,14 +15,9 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
---
--- Table structure for table `application_users`
---
-
-DROP TABLE IF EXISTS `application_users`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `application_users` (
+CREATE TABLE IF NOT EXISTS `member` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `username` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
@@ -35,63 +30,61 @@ CREATE TABLE `application_users` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `application_users`
+-- Dumping data for table `member`
 --
 
-/*!40000 ALTER TABLE `application_users` DISABLE KEYS */;
-INSERT INTO `application_users` VALUES(1,'superadmin','superadmin','$2a$10$iYGLwSxRDXxnA4mRQPkEK.acxgmXwFhE37BtXzdYr4kEnH/toEJ96','superadmin','superadmin',1);
-/*!40000 ALTER TABLE `application_users` ENABLE KEYS */;
+/*!40000 ALTER TABLE `member` DISABLE KEYS */;
+INSERT INTO `member` VALUES(1,'superadmin','superadmin','$2a$10$iYGLwSxRDXxnA4mRQPkEK.acxgmXwFhE37BtXzdYr4kEnH/toEJ96','superadmin','superadmin',1);
+/*!40000 ALTER TABLE `member` ENABLE KEYS */;
 
 --
--- Table structure for table `roles`
+-- Table structure for table `authority`
 --
 
-DROP TABLE IF EXISTS `roles`;
+
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `roles` (
+CREATE TABLE IF NOT EXISTS `authority` (
   `id` bigint NOT NULL AUTO_INCREMENT,
-  `authority` varchar(255) NOT NULL,
+  `authority_name` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `roles`
+-- Dumping data for table `authority`
 --
 
-/*!40000 ALTER TABLE `roles` DISABLE KEYS */;
-INSERT INTO `roles` VALUES
+/*!40000 ALTER TABLE `authority` DISABLE KEYS */;
+INSERT INTO `authority` VALUES
 (1,'ROLE_SUPERADMIN'),
 (2,'ROLE_SYSTEM_ADMINISTRATOR');
-/*!40000 ALTER TABLE `roles` ENABLE KEYS */;
+/*!40000 ALTER TABLE `authority` ENABLE KEYS */;
 
 --
--- Table structure for table `user_role`
+-- Table structure for table `member_authority`
 --
 
-DROP TABLE IF EXISTS `user_role`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `user_role` (
-  `user_id` bigint NOT NULL,
-  `role_id` bigint NOT NULL,
-  PRIMARY KEY (`user_id`,`role_id`),
-  KEY `role_id` (`role_id`),
-  CONSTRAINT `user_role_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `application_users` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `user_role_ibfk_2` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE
+CREATE TABLE IF NOT EXISTS `member_authority` (
+  `member_id` bigint NOT NULL,
+  `authority_id` bigint NOT NULL,
+  PRIMARY KEY (`member_id`,`authority_id`),
+  CONSTRAINT `member_authority_ibfk_1` FOREIGN KEY (`member_id`) REFERENCES `member` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `member_authority_ibfk_2` FOREIGN KEY (`authority_id`) REFERENCES `authority` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `user_role`
+-- Dumping data for table `member_authority`
 --
 
-/*!40000 ALTER TABLE `user_role` DISABLE KEYS */;
-INSERT INTO `user_role` VALUES
+/*!40000 ALTER TABLE `member_authority` DISABLE KEYS */;
+INSERT INTO `member_authority` VALUES
 (1,1),
 (1,2);
-/*!40000 ALTER TABLE `user_role` ENABLE KEYS */;
+/*!40000 ALTER TABLE `member_authority` ENABLE KEYS */;
 
 --
 -- Dumping routines for database 'users'

@@ -24,8 +24,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import io.jsonwebtoken.Claims;
-import it.uniroma1.authenticationserver.entities.Role;
-import it.uniroma1.authenticationserver.entities.User;
+import it.uniroma1.authenticationserver.entities.Authority;
+import it.uniroma1.authenticationserver.entities.Member;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -43,16 +43,16 @@ public class JwtFilter extends OncePerRequestFilter {
      * @param claims The claims of the token
      * @return
      */
-    private User createUserbyClaims(Claims claims) {
+    private Member createUserbyClaims(Claims claims) {
         if(claims != null) {
-            User u = new User();
+            Member u = new Member();
             u.setUsername(claims.get("username", String.class));
             u.setEnabled(claims.get("enabled", Boolean.class));
-            Set<Role> authorities = new HashSet<Role>();
+            Set<Authority> authorities = new HashSet<Authority>();
             List<String> stringaAthorities = claims.get("roles", List.class);
             for(String tmp : stringaAthorities) {
-                Role r = new Role();
-                r.setAuthority(tmp);
+                Authority r = new Authority();
+                r.setAuthorityName(tmp);
                 authorities.add(r);
             }
             u.setAuthorities(authorities);
@@ -77,7 +77,7 @@ public class JwtFilter extends OncePerRequestFilter {
                     boolean isTokenExpired = jwtUtil.isTokenExpired(token);
                     //3. Create the user and insert into Security Context
                     if(!isTokenExpired && claims != null) {
-                        User u = createUserbyClaims(claims);
+                        Member u = createUserbyClaims(claims);
                         if(u != null) {
                                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(u.getUsername(), null, u.getAuthorities());
                                SecurityContextHolder.getContext().setAuthentication(auth); //Authenticate the user
