@@ -23,6 +23,7 @@ import { SigninComponent } from './components/signin/signin.component';
 import { MenuBarComponent } from './components/menu-bar/menu-bar.component';
 import { MenubarModule } from 'primeng/menubar';
 import {CheckboxModule} from 'primeng/checkbox';
+import { TableModule } from 'primeng/table';
 import { HeadingPageComponent } from './heading-page/heading-page.component';
 
 
@@ -55,6 +56,7 @@ import { HeadingPageComponent } from './heading-page/heading-page.component';
     MessageModule,
     MenubarModule,
     CheckboxModule,
+    TableModule
     
   ],
   providers: [

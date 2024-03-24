@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { environment } from '../../../environment/environment';
 import { HeadingPageComponent } from '../../heading-page/heading-page.component';
 import { Observable, catchError } from 'rxjs';
+import { UserService } from '../../services/user.service';
 
 
 
@@ -25,39 +26,40 @@ export class AddUserComponent {
   roles!: Roles[] ;
   message: string;
   severity: string;
+  showError: boolean = false;
 
-
-  constructor(private http: HttpClient, private router: Router){
+  constructor(private service: UserService, private router: Router){
   }
 
   onAddUser() {
-
-      
-      this.addUserForm.removeControl("confirmPassword");
-
-      this.addUser(this.addUserForm).subscribe( { 
-      
-        next: (data: any) => {
-          console.log(data)
-          this.message = "User insert done"
-          this.severity = 'info';
+      console.log(this.addUserForm.get("confirmPassword").value)
+      if (this.addUserForm.get("confirmPassword").value === this.addUserForm.get("password").value) {
+        this.addUserForm.removeControl("confirmPassword");
+    
+        this.service.addUser(this.addUserForm).subscribe( { 
           
-        },
-        error: (err) => {
-          console.log(err);
-          this.message = err.error;
-          this.severity = 'error';
-        }})
-        this.router.navigateByUrl('/users/add')
+          next: (data: any) => {
+            console.log(data)
+            this.message = "User insert done"
+            this.severity = 'info';
+            
+          },
+          error: (err) => {
+            console.log(err);
+            this.message = err.error;
+            this.severity = 'error';
+          }})
+          this.router.navigateByUrl('/users/add')
+      } else {
+        
+        this.showError = true;
+      }
+      
+     
+   
+    
   }
 
-  addUser(addUserForm: FormGroup): Observable<any>{
-    const httpOptions = {
-      headers: new HttpHeaders({ 'Content-Type': 'application/json' })
-    };
-    const addUserUrl = environment.addUser;
-    return this.http.post(addUserUrl,addUserForm.value, httpOptions);
-  }
 
   ngOnInit() {
 

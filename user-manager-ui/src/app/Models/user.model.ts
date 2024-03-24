@@ -3,7 +3,11 @@ import { endWith } from "rxjs";
 export class User{
     constructor(
         public id: string,
+        public name: string,
+        public surname: string,        
         public username: string,
+        public email: string,
+        public roles: [],
         private _token: string
     ) {}
 

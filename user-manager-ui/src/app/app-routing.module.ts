@@ -16,17 +16,17 @@ const routes: Routes = [
   {
     path: 'users',
     component: UsersComponent,
-    canActivate: [AuthGuard]
+    // canActivate: [AuthGuard]
   },
   {
     path: 'users/add',
     component: AddUserComponent,
-    canActivate: [AuthGuard]
+    // canActivate: [AuthGuard]
   },
   {
-    path: 'users/edit',
+    path: 'users/edit/:id',
     component: EditUserComponent,
-    canActivate: [AuthGuard]
+    // canActivate: [AuthGuard]
   },
   {
     path: 'logout',

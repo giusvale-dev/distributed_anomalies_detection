@@ -1,4 +1,13 @@
 import { Component } from '@angular/core';
+import { UserService } from '../../services/user.service';
+import { User } from '../../Models/user.model';
+import { environment } from '../../../environment/environment';
+import { Router } from '@angular/router';
+
+interface Column{
+  field: string;
+  header: string;
+}
 
 @Component({
   selector: 'app-users',
@@ -6,5 +15,31 @@ import { Component } from '@angular/core';
   styleUrls: ['./users.component.css']
 })
 export class UsersComponent {
+  users: User[]
+  cols: Column[];
+  resp: any;
 
+  constructor(private userService: UserService, private router: Router) {}
+
+  ngOnInit(): void{
+    this.cols = [
+      { field: 'id', header: 'ID'},
+      { field: 'firstName', header: 'Name'},
+      { field: 'lastName', header: 'Surname'},
+      { field: 'username', header: 'Username'},
+      { field: 'email', header: 'Email'},
+      { field: 'roles', header: 'Roles'},
+      { field: 'actions', header: 'Actions'},
+    ]
+    this.resp = this.userService.getUsers('https://dummyjson.com/users').subscribe({
+      next: (data: any) => {
+        this.users = data.users
+        
+      }
+    })
+  }
+
+  onClick(){
+    this.router.navigateByUrl('users/edit')
+  }
 }
