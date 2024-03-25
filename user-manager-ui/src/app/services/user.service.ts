@@ -15,7 +15,7 @@ export class UserService {
   constructor(private http: HttpClient) { }
 
   getUser(id: string): Observable<any>{
-    return this.http.get('https://dummyjson.com/users/' + `${ id }`)
+    return this.http.get(`${environment.usersUrl}`+ `${ id }`)
   }
 
   getUsers(url: string): Observable<any>{

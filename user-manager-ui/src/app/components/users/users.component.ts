@@ -31,7 +31,7 @@ export class UsersComponent {
       { field: 'roles', header: 'Roles'},
       { field: 'actions', header: 'Actions'},
     ]
-    this.resp = this.userService.getUsers('https://dummyjson.com/users').subscribe({
+    this.resp = this.userService.getUsers(`${environment.usersUrl}`).subscribe({
       next: (data: any) => {
         this.users = data.users
         
