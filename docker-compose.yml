@@ -9,7 +9,10 @@ services:
       - "5672:5672"
     networks:
       - common-net
-      
+    volumes:
+      - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      - ./rabbitmq/definitions.json:/etc/rabbitmq/definitions.json:ro
+
   authentication-service:
     image: authentication-service
     build: ./authentication-service
@@ -56,20 +59,25 @@ services:
         "spring.datasource.initialization-mode":"always",
         "spring.jpa.defer-datasource-initialization":"true",
         "logging.level.org.hibernate.type.descriptor.sql.BasicBinder":"TRACE",
-        "jwt.symmetric.key":"01234567890123456789012345678901"
+        "jwt.symmetric.key":"01234567890123456789012345678901",
+        "queue.rabbitmq.listener.name": "user_queue_instance_1",
+        "binding.rabbitmq.key" : "user_key_queue_1",
+        "spring.rabbitmq.host":"rabbitmq",
+        "spring.rabbitmq.port":"5672",
+        "spring.rabbitmq.username":"guest",
+        "spring.rabbitmq.password":"guest"
         }'
     networks:
       - common-net
     depends_on:
       - mysqldb
+      - userservice
 
   userservice:
     image: userservice
     build: ./userservice
     ports:
       - "8081:8080"
-    depends_on:
-      - rabbitmq
     networks:
       - common-net
 

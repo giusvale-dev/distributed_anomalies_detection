@@ -30,7 +30,7 @@ export class EditUserComponent {
       oldPassword: new FormControl("", Validators.required),
       newPassword: new FormControl("",Validators.required),
       confirmPassword: new FormControl("",Validators.required),
-      sel_roles: new FormControl("",Validators.required)
+      roles: new FormControl("",Validators.required)
     })
   }
 }

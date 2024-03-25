@@ -1,5 +1,5 @@
 // environment.ts
 export const environment = {
-    loginUrl: 'http://localhost:8082/api/login',
-    addUser: 'http://localhost:8081/api/user/insert',
+    loginUrl: 'http://authentication-service:8082/api/login',
+    addUser: 'http://userservice:8081/api/user/insert',
   };

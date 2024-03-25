@@ -21,6 +21,8 @@ package it.uniroma1.userservice.controllers;
 
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,6 +47,8 @@ import it.uniroma1.userservice.messaging.MessageProducer;
 @Validated
 public class UserServiceController {
 
+    Logger logger = LoggerFactory.getLogger(UserServiceController.class);
+
     @Autowired
     private MessageProducer messageProducer;
 
@@ -64,6 +68,7 @@ public class UserServiceController {
     @PreAuthorize("hasRole('SUPERADMIN')")
     public ResponseEntity<String> insertUser(@Valid @RequestBody UserInsertModel userModel) {
         try {
+            logger.info("inserUser()");
             User u = userModel.toUser();
             MessagePayload mp = new MessagePayload(OperationType.INSERT, u);
             String response = messageProducer.sendMessage(mp);

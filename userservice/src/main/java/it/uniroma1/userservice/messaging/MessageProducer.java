@@ -19,6 +19,8 @@
 
 package it.uniroma1.userservice.messaging;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +36,8 @@ import it.uniroma1.userservice.entities.User;
 @Service
 public class MessageProducer {
 
+    Logger logger = LoggerFactory.getLogger(MessageProducer.class);
+
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
@@ -44,6 +48,7 @@ public class MessageProducer {
     private String keyBinding;
 
     public String sendMessage(MessagePayload payload) throws InvalidInputParameter, JsonProcessingException {
+        logger.info(String.format("sendMessage() -> %s", payload.getUser().getName()));
         if(payload != null) {     
             boolean isValidUser = userValidator(payload.getUser());
             if(isValidUser) {
