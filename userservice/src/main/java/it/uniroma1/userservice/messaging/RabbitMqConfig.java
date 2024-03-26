@@ -45,11 +45,6 @@ public class RabbitMqConfig {
         return new Queue(queueName, false);
     }
 
-    /**
-     * Declared as final because in this type of connection we need only one
-     * exchange to publish the message and many consumers
-     */
-    
     @Bean
     public DirectExchange exchange() {
         return new DirectExchange("user_exchange");

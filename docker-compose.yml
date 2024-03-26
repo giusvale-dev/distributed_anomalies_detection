@@ -71,13 +71,22 @@ services:
       - common-net
     depends_on:
       - mysqldb
-      - userservice
 
   userservice:
     image: userservice
     build: ./userservice
     ports:
       - "8081:8080"
+    environment:
+      SPRING_APPLICATION_JSON: '{
+        "jwt.symmetric.key":"01234567890123456789012345678901",
+        "queue.rabbitmq.listener.name": "user_queue_instance_1",
+        "binding.rabbitmq.key" : "user_key_queue_1",
+        "spring.rabbitmq.host":"rabbitmq",
+        "spring.rabbitmq.port":"5672",
+        "spring.rabbitmq.username":"guest",
+        "spring.rabbitmq.password":"guest"
+        }'
     networks:
       - common-net
 

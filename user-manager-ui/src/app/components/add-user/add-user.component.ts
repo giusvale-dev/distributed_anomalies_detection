@@ -5,14 +5,8 @@ import { Router } from '@angular/router';
 import { environment } from '../../../environment/environment';
 import { HeadingPageComponent } from '../../heading-page/heading-page.component';
 import { Observable, catchError } from 'rxjs';
-
-
-
  
-interface Roles {
-  label: string;
-  value: string;
-}
+
 @Component({
   selector: 'app-add-user',
   templateUrl: './add-user.component.html',
@@ -22,7 +16,7 @@ export class AddUserComponent {
   
   addUserForm!: FormGroup;
   title: string;
-  roles!: Roles[] ;
+  roles!: string[];
   message: string;
   severity: string;
 
@@ -34,7 +28,7 @@ export class AddUserComponent {
 
       
       this.addUserForm.removeControl("confirmPassword");
-
+      
       this.addUser(this.addUserForm).subscribe( { 
       
         next: (data: any) => {
@@ -64,8 +58,8 @@ export class AddUserComponent {
     this.title = "Create user page"
     
     this.roles= [
-      {label: "ScAdmin", value: "Security Administrator"},
-      {label: "User", value: "User"},
+      "ROLE_SUPERADMIN",
+      "ROLE_SYSTEM_ADMINISTRATOR",
     ];
     this.addUserForm = new FormGroup({
       name: new FormControl(),

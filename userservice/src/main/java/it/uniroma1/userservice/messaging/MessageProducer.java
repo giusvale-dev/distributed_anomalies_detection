@@ -48,7 +48,7 @@ public class MessageProducer {
     private String keyBinding;
 
     public String sendMessage(MessagePayload payload) throws InvalidInputParameter, JsonProcessingException {
-        logger.info(String.format("sendMessage() -> %s", payload.getUser().getName()));
+        
         if(payload != null) {     
             boolean isValidUser = userValidator(payload.getUser());
             if(isValidUser) {
@@ -59,10 +59,8 @@ public class MessageProducer {
             } else {
                 throw new InvalidInputParameter("User is not valid");
             }
-        } else {
-            throw new InvalidInputParameter("Payload is not valid");
         }
-
+        return null;
     }
 
     private boolean userValidator(User u) {

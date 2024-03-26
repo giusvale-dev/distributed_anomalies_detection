@@ -25,6 +25,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -46,6 +48,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    Logger logger = LoggerFactory.getLogger(JwtFilter.class);
 
     /**
      * Convert the claims into User object
@@ -79,19 +83,23 @@ public class JwtFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         
         try {
+            logger.info("doFilterInternal");
             if(!isPublicUrl(request)) {
                 String token = extractToken(request.getHeader("Authorization"));
                 if(token != null) {
+                    logger.info(token);
                     //1. Check token signature and extract all information
                     Claims claims = jwtUtil.extractAllClaims(token);
                     //2. Check if the token is not expired
                     boolean isTokenExpired = jwtUtil.isTokenExpired(token);
                     //3. Create the user and insert into Security Context
                     if(!isTokenExpired && claims != null) {
+                        logger.info("xxxx");
                         User u = createUserbyClaims(claims);
                         if(u != null) {
                                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(u.getUsername(), null, u.getAuthorities());
                                SecurityContextHolder.getContext().setAuthentication(auth); //Authenticate the user
+                               logger.info("yyyy");
                         }
                     } else {
                         SecurityContextHolder.clearContext();
