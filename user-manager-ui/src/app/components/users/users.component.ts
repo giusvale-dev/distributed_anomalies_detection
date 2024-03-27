@@ -13,9 +13,10 @@ interface Column{
 @Component({
   selector: 'app-users',
   templateUrl: './users.component.html',
-  styleUrls: ['./users.component.css']
+  styleUrls: ['./users.component.css'],
+  providers: [ConfirmationService, MessageService]
 })
-export class UsersComponent {
+export class UsersComponent  {
   users: User[]
   cols: Column[];
   resp: any;

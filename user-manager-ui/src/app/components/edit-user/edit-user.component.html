@@ -1,6 +1,6 @@
 <app-menu-bar></app-menu-bar>
 <div class="pt-5 pb-5"></div>
-<div >
+<div>
   <p-card
     title="edit-user"
     header="Edit User"
@@ -8,6 +8,7 @@
     [style]="{ width: '45rem' }"
   >
     <form
+      [autocomplete]="false"
       [formGroup]="editUserForm"
       (ngSubmit)="onEditUser()"
       class="flex flex-column align-items-center"
@@ -15,7 +16,7 @@
     >
       <div class="field py-2">
         <p-floatLabel>
-          <input id="name" type="text" pInputText formControlName="name" />
+          <input id="name" type="text" pInputText formControlName="name"/>
           <label for="name">Name</label>
         </p-floatLabel>
       </div>
@@ -38,13 +39,13 @@
             pInputText
             formControlName="username"
           />
-          
+
           <label for="username">Username</label>
         </p-floatLabel>
       </div>
       <div class="field py-2">
         <p-floatLabel>
-          <input id="email" type="email" pInputText formControlName="email" />
+          <input id="email" type="email" pInputText formControlName="email"/>
           <label for="email">Email</label>
         </p-floatLabel>
       </div>
@@ -65,7 +66,7 @@
             id="newPassword"
             type="password"
             pInputText
-            formControlName="confirmPassword"
+            formControlName="newPassword"
           />
           <label for="newPassword">New Password</label>
         </p-floatLabel>
@@ -82,9 +83,8 @@
         </p-floatLabel>
       </div>
       <div class="field py-2">
-        <span
-          ><label for="enabled">User enabled </label>
-          <p-checkbox formControlName="enabled" [binary]="true"></p-checkbox>
+        <span><label for="user-enabled">User enabled </label>
+          <p-checkbox [inputId]="'user-enabled'" formControlName="enabled" [binary]="true"></p-checkbox>
         </span>
       </div>
       <div class="field py-2">
@@ -100,6 +100,7 @@
         </span>
       </div>
       <p-message [hidden]="!showError" class="mt-2" severity="error" text="Passwords do not match"></p-message>
+
       <div class="button py-5">
         <p-button
           label="Edit User"

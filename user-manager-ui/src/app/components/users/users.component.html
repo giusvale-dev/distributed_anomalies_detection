@@ -12,6 +12,7 @@
       [value]="users"
       styleClass="p-datatable-gridlines"
       [tableStyle]="{ 'min-width': '45rem' }"
+     
     >
       <ng-template pTemplate="header" let-columns>
         <tr>
@@ -50,7 +51,8 @@
               [style]="{ width: '1.6rem', height: '1.5rem' }"
               (click)="onClick()"
             ></button>
-
+            <p-toast></p-toast>
+            <p-confirmPopup></p-confirmPopup>
             <button
               pButton
               pRipple
@@ -58,6 +60,7 @@
               icon="pi pi-trash"
               class="p-button-rounded p-button-outlined p-button-danger "
               [style]="{ width: '1.6rem', height: '1.5rem' }"
+              (click)="confirm2($event)"
             ></button>
           </td>
         </tr>

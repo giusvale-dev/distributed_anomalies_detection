@@ -16,7 +16,7 @@ const routes: Routes = [
   {
     path: 'users',
     component: UsersComponent,
-    // canActivate: [AuthGuard]
+    canActivate: [AuthGuard]
   },
   {
     path: 'users/add',
@@ -26,7 +26,7 @@ const routes: Routes = [
   {
     path: 'users/edit/:id',
     component: EditUserComponent,
-    // canActivate: [AuthGuard]
+    canActivate: [AuthGuard]
   },
   {
     path: 'logout',
