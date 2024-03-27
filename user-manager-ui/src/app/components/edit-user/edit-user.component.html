@@ -1,5 +1,5 @@
-<div style="width: 1024px; height: 100px"></div>
 <app-menu-bar></app-menu-bar>
+<div class="pt-5 pb-5"></div>
 <div>
   <p-card
     title="edit-user"
@@ -8,13 +8,15 @@
     [style]="{ width: '45rem' }"
   >
     <form
+      [autocomplete]="false"
       [formGroup]="editUserForm"
       (ngSubmit)="onEditUser()"
       class="flex flex-column align-items-center"
+      *ngIf="editUserForm != null"
     >
       <div class="field py-2">
         <p-floatLabel>
-          <input id="name" type="text" pInputText formControlName="name" />
+          <input id="name" type="text" pInputText formControlName="name"/>
           <label for="name">Name</label>
         </p-floatLabel>
       </div>
@@ -37,20 +39,13 @@
             pInputText
             formControlName="username"
           />
-          <p-message
-            *ngIf="
-              !editUserForm.get('username')?.valid &&
-              editUserForm.get('username')?.touched
-            "
-            severity="error"
-            text="Username is required"
-          ></p-message>
+
           <label for="username">Username</label>
         </p-floatLabel>
       </div>
       <div class="field py-2">
         <p-floatLabel>
-          <input id="email" type="email" pInputText formControlName="email" />
+          <input id="email" type="email" pInputText formControlName="email"/>
           <label for="email">Email</label>
         </p-floatLabel>
       </div>
@@ -71,7 +66,7 @@
             id="newPassword"
             type="password"
             pInputText
-            formControlName="confirmPassword"
+            formControlName="newPassword"
           />
           <label for="newPassword">New Password</label>
         </p-floatLabel>
@@ -88,6 +83,11 @@
         </p-floatLabel>
       </div>
       <div class="field py-2">
+        <span><label for="user-enabled">User enabled </label>
+          <p-checkbox [inputId]="'user-enabled'" formControlName="enabled" [binary]="true"></p-checkbox>
+        </span>
+      </div>
+      <div class="field py-2">
         <span class="p-float-label">
           <p-multiSelect
             inputId="float-label"
@@ -99,11 +99,13 @@
           <label for="float-label">Select Roles</label>
         </span>
       </div>
+      <p-message [hidden]="!showError" class="mt-2" severity="error" text="Passwords do not match"></p-message>
+
       <div class="button py-5">
         <p-button
-          label="Create User"
+          label="Edit User"
           type="submit"
-          [disabled]="!editUserForm.valid"
+          [disabled]="editUserForm.invalid"
         ></p-button>
       </div>
     </form>

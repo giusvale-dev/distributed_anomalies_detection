@@ -1,2 +1,70 @@
 <app-menu-bar></app-menu-bar>
-<p>users works!</p>
+<div class="pt-5 pb-5"></div>
+<p-card
+  title="users"
+  header="Users"
+  class="flex-1 flex align-items-center justify-content-center text-center"
+  [style]="{ width: '70rem' }"
+>
+  <div class="card">
+    <p-table
+      [columns]="cols"
+      [value]="users"
+      styleClass="p-datatable-gridlines"
+      [tableStyle]="{ 'min-width': '45rem' }"
+     
+    >
+      <ng-template pTemplate="header" let-columns>
+        <tr>
+          <th *ngFor="let col of columns">
+            {{ col.header }}
+          </th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-rowData let-columns="columns">
+        <tr [pSelectableRow]="rowData">
+          <td>
+            {{ rowData.id }}
+          </td>
+          <td>
+            {{ rowData.firstName }}
+          </td>
+          <td>
+            {{ rowData.lastName }}
+          </td>
+          <td>
+            {{ rowData.username }}
+          </td>
+          <td>
+            {{ rowData.email }}
+          </td>
+          <td>
+            {{ rowData.roles }}
+          </td>
+          <td>
+            <button
+              pButton
+              pRipple
+              type="button"
+              icon="pi pi-user-edit"
+              class="p-button-rounded p-button-outlined  ml-1 mr-2 "
+              [style]="{ width: '1.6rem', height: '1.5rem' }"
+              (click)="onClick()"
+            ></button>
+            <p-toast></p-toast>
+            <p-confirmPopup></p-confirmPopup>
+            <button
+              pButton
+              pRipple
+              type="button"
+              icon="pi pi-trash"
+              class="p-button-rounded p-button-outlined p-button-danger "
+              [style]="{ width: '1.6rem', height: '1.5rem' }"
+              (click)="confirm2($event)"
+            ></button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</p-card>
