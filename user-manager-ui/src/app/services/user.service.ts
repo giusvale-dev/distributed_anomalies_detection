@@ -15,7 +15,7 @@ export class UserService {
   constructor(private http: HttpClient) { }
 
   getUser(id: string): Observable<any>{
-    return this.http.get(`${environment.usersUrl}`+ `${ id }`)
+    return this.http.get(`${environment.usersUrl}`+ `/${ id }`)
   }
 
   getUsers(url: string): Observable<any>{
@@ -28,5 +28,13 @@ export class UserService {
     };
     const addUserUrl = environment.addUser;
     return this.http.post(addUserUrl,addUserForm.value, httpOptions);
+  }
+
+  editUser(editUserForm: FormGroup, id: string): Observable<any>{
+    const httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+    };
+    const addUserUrl = environment.addUser;
+    return this.http.post(`${environment.editUserUrl}`+ `/${ id }`,editUserForm.value, httpOptions);
   }
 }

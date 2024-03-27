@@ -77,7 +77,8 @@ export class AddUserComponent {
       password: new FormControl("", Validators.required),
       confirmPassword: new FormControl("",Validators.required),
       sel_roles: new FormControl(""),
-      enabled: new FormControl(true, Validators.required)
+      enabled: new FormControl(true, Validators.required),
+      
     })
   }
 
