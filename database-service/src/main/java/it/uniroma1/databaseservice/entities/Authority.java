@@ -22,6 +22,8 @@ package it.uniroma1.databaseservice.entities;
 
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -39,6 +41,7 @@ import lombok.Setter;
 @Setter
 @Getter
 @Entity
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Authority {
 
     @Id

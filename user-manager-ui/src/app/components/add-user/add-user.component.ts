@@ -16,7 +16,7 @@ export class AddUserComponent {
   
   addUserForm!: FormGroup;
   title: string;
-  roles!: string[];
+  authorities!: string[];
   message: string;
   severity: string;
 
@@ -57,7 +57,7 @@ export class AddUserComponent {
 
     this.title = "Create user page"
     
-    this.roles= [
+    this.authorities= [
       "ROLE_SUPERADMIN",
       "ROLE_SYSTEM_ADMINISTRATOR",
     ];
@@ -68,7 +68,7 @@ export class AddUserComponent {
       email: new FormControl("", [Validators.required, Validators.email]),
       password: new FormControl("", Validators.required),
       confirmPassword: new FormControl("",Validators.required),
-      roles: new FormControl(""),
+      authorities: new FormControl(""),
       enabled: new FormControl(true, Validators.required)
     })
   }

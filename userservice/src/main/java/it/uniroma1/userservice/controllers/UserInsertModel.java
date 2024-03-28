@@ -56,7 +56,7 @@ public class UserInsertModel {
     @NotBlank
     private Boolean enabled;
 
-    private List<String> roles;
+    private List<String> authorities;
 
     public User toUser() {
 
@@ -69,10 +69,11 @@ public class UserInsertModel {
         u.setUsername(username);
 
         Set<Role> rolesForUser = new HashSet<Role>();
-        if(roles != null && !roles.isEmpty()) {
-            for(String tmp : roles) {
+        if(authorities != null && !authorities.isEmpty()) {
+            for(String tmp : authorities) {
                 Role r = new Role();
                 r.setAuthority(tmp);
+                rolesForUser.add(r);
             }
         }
         u.setAuthorities(rolesForUser);

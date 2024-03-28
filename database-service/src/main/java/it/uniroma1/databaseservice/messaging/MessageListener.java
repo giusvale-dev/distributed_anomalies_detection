@@ -1,7 +1,22 @@
+/**
+ * MIT No Attribution
+ *
+ *Copyright 2024 Giuseppe Valente <valentepeppe@gmail.com>
+ *
+ *Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ *software and associated documentation files (the "Software"), to deal in the Software
+ *without restriction, including without limitation the rights to use, copy, modify,
+ *merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+ *permit persons to whom the Software is furnished to do so.
+ *
+ *THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ *INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+ *PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ *OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+ *SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 package it.uniroma1.databaseservice.messaging;
-
-import java.util.HashSet;
-import java.util.Set;
 
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +31,7 @@ import it.uniroma1.databaseservice.entities.Authority;
 import it.uniroma1.databaseservice.entities.Member;
 import it.uniroma1.databaseservice.repositories.AuthorityRepository;
 import it.uniroma1.databaseservice.repositories.MemberRepository;
+import jakarta.transaction.Transactional;
 
 @Service
 public class MessageListener {
@@ -28,6 +44,7 @@ public class MessageListener {
 
     @RabbitListener(queues = {"${queue.rabbitmq.listener.name}"})
     @SendTo("user_exchange/${binding.rabbitmq.key}")
+    @Transactional
     public String receiveMessage(String message) throws JsonProcessingException {
 
         ACK<Member> replyMessage = new ACK<Member>();
@@ -44,25 +61,22 @@ public class MessageListener {
                 switch(mp.getOperationType()) {
                     case INSERT:
                         Member m = mp.getUser();
-                        Set<Authority> rolesForUser = m.getAuthorities();
                         //Insert the member if it doesn't exist
                         if(memberRepository.findByUsername(m.getUsername()) == null) {
                             BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
                             m.setPassword(bCryptPasswordEncoder.encode(m.getPassword()));
-                            m = memberRepository.save(m);
-                        
-                            /* m is inserted in the persistence context *
-                            * then check if the roles exist            *
-                            *                                          */                     
-                            if (rolesForUser != null && !rolesForUser.isEmpty()) {
-                                for(Authority a : rolesForUser) {
-                                    //load the role in the persistence context
-                                    long id = authorityRepository.findIdByAuthorityName(a.getAuthorityName().toUpperCase());
-                                    Authority tmp = authorityRepository.findById(id).get();
-                                    m.getAuthorities().add(tmp);
+                            if(m.getAuthorities() != null && !m.getAuthorities().isEmpty()) {
+                                Authority tmp = null;
+                                for(Authority a : m.getAuthorities()) {
+                                    if(a != null) {
+                                        tmp = authorityRepository.findByAuthorityName(a.getAuthorityName().toUpperCase());
+                                    }
+                                    if(tmp != null) {
+                                        m.getAuthorities().add(a);
+                                    }
                                 }
-                                m = memberRepository.save(m); //Update                            
                             }
+                            m = memberRepository.save(m);
                             replyMessage.setMessage("Ok");
                             replyMessage.setPayload(m);
                             replyMessage.setSuccess(true);

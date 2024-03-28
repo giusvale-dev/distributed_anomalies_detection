@@ -7,6 +7,12 @@ To use this project you need to run the following commands:
 mvn clean install compile test -Dspring.config.location=file:./src/main/resources/application-dev.properties
 ```
 
+To develop you need the container
+```bash
+docker run --rm -d --name rabbitmq  -p 15672:15672 -p 5672:5672 rabbitmq:3-management
+```
+
+
 For production environment use the docker-compose file
 
 If you need to add this configuration in your code, you can use this configuration (visual studio code)

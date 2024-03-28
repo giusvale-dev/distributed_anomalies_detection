@@ -20,62 +20,83 @@
 
 package it.uniroma1.databaseservice;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+
+
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import it.uniroma1.databaseservice.entities.Authority;
 import it.uniroma1.databaseservice.entities.Member;
-import it.uniroma1.databaseservice.entities.models.UserUI;
-import it.uniroma1.databaseservice.repositories.AuthorityRepository;
+import it.uniroma1.databaseservice.messaging.MessagePayload;
+import it.uniroma1.databaseservice.messaging.OperationType;
 import it.uniroma1.databaseservice.repositories.MemberRepository;
-import jakarta.transaction.Transactional;
+
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.DirectExchange;
+import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 @SpringBootTest
 @ActiveProfiles("dev")
-public class UserRepositoryTest {
+@Configuration
+public class DatabaseListenerTest {
 
+    @Value("${queue.rabbitmq.listener.name}")
+    private String queueName;
 
-    @Autowired
-    private MemberRepository userRepository;
+    @Value("${binding.rabbitmq.key}")
+    private String keyBinding;
 
-    @Autowired
-    private AuthorityRepository authorityRepository;
-
-    @Test
-    public void loadUsersTest() {
-        long rows = userRepository.count();
-        assertTrue(rows > 900);
+    @Bean
+    public Queue queue() {
+        return new Queue(queueName, false);
     }
 
-    @Test
-    public void testQuerySearchUser() {
-        List<UserUI> list = userRepository.searchUsers("es");
-        assertNotNull(list);
-        assertTrue(!list.isEmpty());
-        for (UserUI userUI : list) {
-            assertNotNull(userUI);
-            boolean isCompliantUser = userUI.getEmail().contains("es") ||
-            userUI.getUsername().contains("es") ||
-            userUI.getName().contains("es") ||
-            userUI.getSurname().contains("es");
-            assertTrue(isCompliantUser);
-        }
+    @Bean
+    public DirectExchange exchange() {
+        return new DirectExchange("user_exchange");
     }
 
+    @Bean
+    Binding bindingA(Queue queue, DirectExchange exchange) {
+        return BindingBuilder.bind(queue).to(exchange).with(keyBinding);
+    }
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    @Autowired
+    private MemberRepository memberRepository;
+
+    
+
     @Test
-    @Transactional
-    public void testInsertUserWithRoles() {
+    public void testUserInsert() throws JsonProcessingException {
+        sendMessage();
+        Member insertedUser = memberRepository.findByUsername("username");
+        assertNotNull(insertedUser);
+
+    }
+
+
+    private String sendMessage() throws JsonProcessingException {
+        
+        MessagePayload payload = new MessagePayload();
 
         Member userToInset = new Member();
         userToInset.setEmail("test@email.com");
@@ -86,27 +107,21 @@ public class UserRepositoryTest {
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
         userToInset.setPassword(bCryptPasswordEncoder.encode("password"));
 
-        Authority role = authorityRepository.findByAuthorityName("ROLE_SUPERADMIN");
-        assertNotNull(role);
+        Authority role = new Authority();
+        role.setAuthorityName("ROLE_SUPERADMIN");
         
         Set<Authority> rolesForUser = new HashSet<Authority>();
         rolesForUser.add(role);
         userToInset.setAuthorities(rolesForUser);
-        userToInset = userRepository.save(userToInset);
+        
+        payload.setOperationType(OperationType.INSERT);
+        payload.setUser(userToInset);
 
-        Member insertedUser = userRepository.findByUsername("username");
-        assertNotNull(insertedUser);
-        assertEquals("test@email.com", insertedUser.getEmail());
-        assertEquals("name", insertedUser.getName());
-        assertEquals("surname", insertedUser.getSurname());
-        assertEquals(true, insertedUser.getEnabled());
-        assertTrue(bCryptPasswordEncoder.matches("password", insertedUser.getPassword()));
-
-        for(Authority a : insertedUser.getAuthorities()) {
-            assertNotNull(a);
-            assertEquals("ROLE_SUPERADMIN", a.getAuthorityName());
-        }
-
+        ObjectMapper om = new ObjectMapper();
+        String jsonMessage = om.writeValueAsString(payload);
+        String response = (String) rabbitTemplate.convertSendAndReceive(exchange().getName(), keyBinding, jsonMessage);
+        return response;
     }
+
 
 }

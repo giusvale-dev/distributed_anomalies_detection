@@ -102,7 +102,7 @@ public class UserControllerTest {
         userToInsert.setUsername("john_doe");
         userToInsert.setPassword(bCryptPasswordEncoder.encode("HelloWorld!123"));
         userToInsert.setEnabled(true);
-        userToInsert.setRoles(null);
+        userToInsert.setAuthorities(null);
 
         ObjectMapper ob = new ObjectMapper();
         String jsonBody = ob.writeValueAsString(userToInsert.toUser());
@@ -152,7 +152,7 @@ public class UserControllerTest {
         userToInsert.setUsername("john_doe");
         userToInsert.setPassword(bCryptPasswordEncoder.encode("HelloWorld!123"));
         userToInsert.setEnabled(true);
-        userToInsert.setRoles(null);
+        userToInsert.setAuthorities(null);
 
         ObjectMapper ob = new ObjectMapper();
         String jsonBody = ob.writeValueAsString(userToInsert.toUser());
@@ -195,7 +195,7 @@ public class UserControllerTest {
         userToInsert.setUsername("john_doe");
         userToInsert.setPassword(bCryptPasswordEncoder.encode("HelloWorld!123"));
         userToInsert.setEnabled(true);
-        userToInsert.setRoles(null);
+        userToInsert.setAuthorities(null);
 
         ObjectMapper ob = new ObjectMapper();
         String jsonBody = ob.writeValueAsString(userToInsert.toUser());
