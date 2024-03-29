@@ -1,81 +1,94 @@
 <app-menu-bar></app-menu-bar>
 <app-heading-page [title]="title"></app-heading-page>
-<p-message class="flex-1 flex align-items-center justify-content-center text-center" [hidden]="message==null" [severity]="severity" [text]="message"></p-message>
-  <p-card
-    title="create-user"
-    header="Create New User"
-    class="flex-1 flex align-items-center justify-content-center text-center"
-    [style]="{ width: '45rem' }"
+<p-card
+  title="create-user"
+  header="Create New User"
+  class="flex-1 flex align-items-center justify-content-center text-center"
+  [style]="{ width: '45rem' }"
+>
+<div>
+  <p-message class="flex-1 flex align-items-center justify-content-center text-center" [hidden]="message==null" [severity]="severity" [text]="message"></p-message>
+</div>
+  <form
+    [formGroup]="addUserForm"
+    (ngSubmit)="onAddUser()"
+    class="flex flex-column align-items-center"
   >
-    <form
-      [formGroup]="addUserForm"
-      (ngSubmit)="onAddUser()"
-      class="flex flex-column align-items-center"
-    >
-      <div class="field py-2">
-        <p-floatLabel>
-          <input id="name" type="text" pInputText formControlName="name" required="required"/>
-          <label for="name">Name</label>
-        </p-floatLabel>
-      </div>
-      <div class="field py-2">
-        <p-floatLabel>
-          <input
-            id="surname"
-            type="text"
-            pInputText
-            formControlName="surname"
-            required="required"
-          />
-          <label for="surname">Surname</label>
-        </p-floatLabel>
-      </div>
-      <div class="field py-2">
-        <p-floatLabel>
-          <input
-            id="username"
-            type="text"
-            pInputText
-            formControlName="username"
-            required="required"
-          />
-          <label for="username">Username</label>
-          
-        </p-floatLabel>
-        
-      </div>
-      <div class="field py-2">
-        <p-floatLabel>
-          <input id="email" type="email" pInputText formControlName="email" required="required"/>
-          <label for="email">Email</label>
-        </p-floatLabel>
-      </div>
-      <div class="field py-2">
-        <p-floatLabel>
-          <input
-            id="password"
-            type="password"
-            pInputText
-            formControlName="password"
-            required="required"
-          />
-          <label for="password">Password</label>
-        </p-floatLabel>
-      </div>
-      <div class="field py-2">
-        <p-floatLabel>
-          <input
-            id="confirmPassword"
-            type="password"
-            pInputText
-            formControlName="confirmPassword"
-            required="required"
-          />
-          <label for="confirmPassword">Confirm Password</label>
-        </p-floatLabel>
-      </div>
-      <div class="field py-2">
-        <span><label for="enabled">User enabled </label>
+    <div class="field py-2">
+      <p-floatLabel>
+        <input
+          id="name"
+          type="text"
+          pInputText
+          formControlName="name"
+          required="required"
+        />
+        <label for="name">Name</label>
+      </p-floatLabel>
+    </div>
+    <div class="field py-2">
+      <p-floatLabel>
+        <input
+          id="surname"
+          type="text"
+          pInputText
+          formControlName="surname"
+          required="required"
+        />
+        <label for="surname">Surname</label>
+      </p-floatLabel>
+    </div>
+    <div class="field py-2">
+      <p-floatLabel>
+        <input
+          id="username"
+          type="text"
+          pInputText
+          formControlName="username"
+          required="required"
+        />
+        <label for="username">Username</label>
+      </p-floatLabel>
+    </div>
+    <div class="field py-2">
+      <p-floatLabel>
+        <input
+          id="email"
+          type="email"
+          pInputText
+          formControlName="email"
+          required="required"
+        />
+        <label for="email">Email</label>
+      </p-floatLabel>
+    </div>
+    <div class="field py-2">
+      <p-floatLabel>
+        <input
+          id="password"
+          type="password"
+          pInputText
+          formControlName="password"
+          required="required"
+        />
+        <label for="password">Password</label>
+      </p-floatLabel>
+    </div>
+    <div class="field py-2">
+      <p-floatLabel>
+        <input
+          id="confirmPassword"
+          type="password"
+          pInputText
+          formControlName="confirmPassword"
+          required="required"
+        />
+        <label for="confirmPassword">Confirm Password</label>
+      </p-floatLabel>
+    </div>
+    <div class="field py-2">
+      <span
+        ><label for="enabled">User enabled </label>
         <p-checkbox formControlName="enabled" [binary]="true"></p-checkbox>
         </span>
       </div>
@@ -90,6 +103,7 @@
           <label for="float-label">Select Roles</label>
         </span>
       </div>
+      <p-message [hidden]="!showError" class="mt-2" severity="error" text="Passwords do not match"></p-message>
       <div class="button py-5">
         <p-button
           label="Create User"
