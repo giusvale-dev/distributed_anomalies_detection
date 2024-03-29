@@ -1,3 +1,21 @@
+/**
+ * MIT No Attribution
+ *
+ *Copyright 2024 Giuseppe Valente <valentepeppe@gmail.com>
+ *
+ *Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ *software and associated documentation files (the "Software"), to deal in the Software
+ *without restriction, including without limitation the rights to use, copy, modify,
+ *merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+ *permit persons to whom the Software is furnished to do so.
+ *
+ *THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ *INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+ *PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ *OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+ *SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 package it.uniroma1.authenticationserver;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -25,6 +43,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.jsonwebtoken.Claims;
 
@@ -76,7 +98,7 @@ public class LoginControllerTest {
     }
 
     @Test
-    public void testJwtTokenVerification() {
+    public void testJwtTokenVerification() throws JsonMappingException, JsonProcessingException {
           
          //Load superadmin user from database
          Member superadmin = userRepository.findByUsername("superadmin");
@@ -100,10 +122,12 @@ public class LoginControllerTest {
                   String.class);
           assertNotNull(response);
           assertEquals(HttpStatusCode.valueOf(200), response.getStatusCode());
-          assertNotNull(response.getBody());
+          ObjectMapper mapper = new ObjectMapper();
+          JwtResponse jwt =  mapper.readValue(response.getBody(), JwtResponse.class);
+          assertNotNull(jwt);
           Claims claims = null;
           try {
-              claims = jwtUtil.extractAllClaims(response.getBody());
+              claims = jwtUtil.extractAllClaims(jwt.toString());
               assertNotNull(claims);
               assertEquals(claims.get("username"), superadmin.getUsername());
               assertEquals(claims.get("enabled"), true);
@@ -144,7 +168,7 @@ public class LoginControllerTest {
     }
 
     @Test
-    public void testAccessToSuperUserResource() {
+    public void testAccessToSuperUserResource() throws JsonMappingException, JsonProcessingException {
         
         //Load superadmin user from database
         Member superadmin = userRepository.findByUsername("superadmin");
@@ -166,7 +190,11 @@ public class LoginControllerTest {
                 requestEntity,
                 String.class);
 
-        String token = response.getBody();
+        ObjectMapper mapper = new ObjectMapper();
+        JwtResponse jwt =  mapper.readValue(response.getBody(), JwtResponse.class);
+        assertNotNull(jwt);
+
+        String token = jwt.toString();
         assertNotNull(token);
 
         headers = new HttpHeaders();
@@ -181,7 +209,7 @@ public class LoginControllerTest {
     }
 
     @Test
-    public void testAccessToSystemAdministratorResource() {
+    public void testAccessToSystemAdministratorResource() throws JsonMappingException, JsonProcessingException {
         
         //Load superadmin user from database
         Member superadmin = userRepository.findByUsername("superadmin");
@@ -203,7 +231,11 @@ public class LoginControllerTest {
                 requestEntity,
                 String.class);
 
-        String token = response.getBody();
+        ObjectMapper mapper = new ObjectMapper();
+        JwtResponse jwt =  mapper.readValue(response.getBody(), JwtResponse.class);
+        assertNotNull(jwt);
+        
+        String token = jwt.toString();
         assertNotNull(token);
 
         headers = new HttpHeaders();

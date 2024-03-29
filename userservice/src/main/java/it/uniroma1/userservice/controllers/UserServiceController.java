@@ -75,12 +75,12 @@ public class UserServiceController {
             if (response != null) {
                 //ACK RECEIVED
                 ObjectMapper om = new ObjectMapper();
-                ACK<User> ack = om.readValue(response, new TypeReference<ACK<User>>() {});
+                ACK<Long> ack = om.readValue(response, new TypeReference<ACK<Long>>() {});
                 if (ack != null) {
                     if (ack.isSuccess()) {
                         if (ack.getPayload() != null) {
                             om = new ObjectMapper();
-                            String bodyResponse = om.writeValueAsString(u);
+                            String bodyResponse = om.writeValueAsString(ack);
                             return ResponseEntity.status(HttpStatus.OK).body(bodyResponse);    
                         } else {
                             return ResponseEntity.status(HttpStatus.OK).body("{ 'response' : 'OK'}");    

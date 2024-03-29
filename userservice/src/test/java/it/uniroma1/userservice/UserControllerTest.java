@@ -105,7 +105,7 @@ public class UserControllerTest {
         userToInsert.setAuthorities(null);
 
         ObjectMapper ob = new ObjectMapper();
-        String jsonBody = ob.writeValueAsString(userToInsert.toUser());
+        String jsonBody = ob.writeValueAsString(userToInsert);
 
         //HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(jsonBody, headers);
         HttpEntity requestEntity = new HttpEntity<>(jsonBody, headers);
@@ -225,12 +225,12 @@ public class UserControllerTest {
     public String receiveMessage(String message) throws JsonMappingException, JsonProcessingException, InvalidInputParameter {
 
 
-        ACK<User> replyMessage = new ACK<>();
+        ACK<Long> replyMessage = new ACK<Long>();
         ObjectMapper om = new ObjectMapper();
         User u = (User) om.readValue(message, User.class);
 
         replyMessage.setMessage("Ok");
-        replyMessage.setPayload(u);
+        replyMessage.setPayload(u.getId());
         replyMessage.setSuccess(true);
 
         String response = om.writeValueAsString(replyMessage);

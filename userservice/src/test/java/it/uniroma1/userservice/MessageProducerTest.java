@@ -79,26 +79,12 @@ public class MessageProducerTest {
 
         //Convert the response to a User
         ObjectMapper om = new ObjectMapper();
-        ACK<User> ack = om.readValue(response, new TypeReference<ACK<User>>() {});
+        ACK<Long> ack = om.readValue(response, new TypeReference<ACK<Long>>() {});
         
         assertNotNull(ack);
         assertEquals(ack.isSuccess(), true);
         assertEquals("Ok", ack.getMessage());
-    
-        User resultUser = ack.getPayload();
-        assertNotNull(resultUser);
-
-        assertEquals(u.getEmail(), resultUser.getEmail());
-        assertEquals(u.getUsername(), resultUser.getUsername());
-        assertEquals(u.getPassword(), resultUser.getPassword());
-        assertEquals(u.getId(), resultUser.getId());
-        assertEquals(u.getName(), resultUser.getName());
-        assertEquals(u.getSurname(), resultUser.getSurname());
-        assertEquals(u.isEnabled(), resultUser.isEnabled());
-        for(Role tmp : resultUser.getAuthorities()) {
-            assertNotNull(tmp);
-
-        }        
+            
     }
 
     @Test

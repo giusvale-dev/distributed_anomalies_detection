@@ -23,6 +23,7 @@ package it.uniroma1.databaseservice.entities;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -49,6 +50,7 @@ public class Authority {
     private Long id;
 
     @Column(name = "authority_name")
+    @JsonProperty(value = "authority")
     private String authorityName;
 
     @ManyToMany(mappedBy = "authorities")

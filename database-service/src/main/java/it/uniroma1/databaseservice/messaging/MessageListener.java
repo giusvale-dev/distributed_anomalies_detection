@@ -18,6 +18,10 @@
  */
 package it.uniroma1.databaseservice.messaging;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -47,68 +51,70 @@ public class MessageListener {
     @Transactional
     public String receiveMessage(String message) throws JsonProcessingException {
 
-        ACK<Member> replyMessage = new ACK<Member>();
-        
-        if(message != null) {
-            ObjectMapper om = new ObjectMapper();
-            MessagePayload mp = null;
-            try {
+        ACK<Long> replyMessage = new ACK<Long>();
+        String response = "";
+        try {
+            if(message != null) {
+                ObjectMapper om = new ObjectMapper();
+                MessagePayload mp = null;
                 mp = (MessagePayload) om.readValue(message, MessagePayload.class);
-            } catch(JsonProcessingException e) {
-                // do nothing
-            }
-            if(mp != null) {        
-                switch(mp.getOperationType()) {
-                    case INSERT:
-                        Member m = mp.getUser();
-                        //Insert the member if it doesn't exist
-                        if(memberRepository.findByUsername(m.getUsername()) == null) {
-                            BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-                            m.setPassword(bCryptPasswordEncoder.encode(m.getPassword()));
-                            if(m.getAuthorities() != null && !m.getAuthorities().isEmpty()) {
-                                Authority tmp = null;
-                                for(Authority a : m.getAuthorities()) {
-                                    if(a != null) {
-                                        tmp = authorityRepository.findByAuthorityName(a.getAuthorityName().toUpperCase());
-                                    }
-                                    if(tmp != null) {
-                                        m.getAuthorities().add(a);
+                if(mp != null) {        
+                    switch(mp.getOperationType()) {
+                        case INSERT:
+                            Member m = mp.getUser();
+                            //Insert the member if it doesn't exist
+                            if(memberRepository.findByUsername(m.getUsername()) == null) {
+                                BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+                                m.setPassword(bCryptPasswordEncoder.encode(m.getPassword()));
+                                Set<Authority> roles = Collections.synchronizedSet(new HashSet<Authority>());
+                                if(m.getAuthorities() != null && !m.getAuthorities().isEmpty()) {
+                                    for(Authority a : m.getAuthorities()) {
+                                        if(a != null && a.getAuthorityName() != null) {
+                                            a = authorityRepository.findByAuthorityName(a.getAuthorityName().toUpperCase());
+                                        }
+                                        if(a != null) {
+                                            roles.add(a);
+                                        }
                                     }
                                 }
+                                m.setAuthorities(roles);
+                                m = memberRepository.save(m);
+                                replyMessage.setMessage("Ok");
+                                replyMessage.setPayload(m.getId());
+                                replyMessage.setSuccess(true);
+                            } else {
+                                replyMessage.setMessage("User exist");
+                                replyMessage.setPayload(0L);
+                                replyMessage.setSuccess(false);
                             }
-                            m = memberRepository.save(m);
-                            replyMessage.setMessage("Ok");
-                            replyMessage.setPayload(m);
-                            replyMessage.setSuccess(true);
-                        } else {
-                            replyMessage.setMessage("User exist");
-                            replyMessage.setPayload(new Member());
+                        break;
+                        default:
+                            replyMessage.setMessage("Operation not supported");
+                            replyMessage.setPayload(0L);
                             replyMessage.setSuccess(false);
-                        }
-                    break;
-                    default:
-                        replyMessage.setMessage("Operation not supported");
-                        replyMessage.setPayload(new Member());
-                        replyMessage.setSuccess(false);
-                    break;
+                        break;
+                    }
+                } else {
+                    replyMessage.setMessage("Unparsable message");
+                    replyMessage.setPayload(0L);
+                    replyMessage.setSuccess(false);
                 }
             } else {
                 replyMessage.setMessage("Unparsable message");
-                replyMessage.setPayload(new Member());
+                replyMessage.setPayload(0L);
                 replyMessage.setSuccess(false);
             }
-            
-        } else {
-            replyMessage.setMessage("Unparsable message");
-            replyMessage.setPayload(new Member());
-            replyMessage.setSuccess(false);
-        }
         
-        ObjectMapper om = new ObjectMapper();
-        String response = om.writeValueAsString(replyMessage);
+        } catch(Exception e) {
+            replyMessage.setMessage(e.getMessage());
+            replyMessage.setPayload(0L);
+            replyMessage.setSuccess(false);
+        } finally {
+            ObjectMapper om = new ObjectMapper();
+            response = om.writeValueAsString(replyMessage);
+        }
 
         //Send back the ACK
         return response;
     }
-
 }

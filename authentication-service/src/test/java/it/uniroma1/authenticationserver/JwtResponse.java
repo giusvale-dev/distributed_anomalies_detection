@@ -16,31 +16,23 @@
  *OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  *SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+package it.uniroma1.authenticationserver;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-package it.uniroma1.databaseservice.repositories;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.util.List;
-
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-
-import it.uniroma1.databaseservice.entities.Member;
-import it.uniroma1.databaseservice.entities.models.UserUI;
-
-public interface MemberRepository extends JpaRepository<Member, Long>{
-
-    @Query("SELECT NEW it.uniroma1.databaseservice.entities.models.UserUI(u.id, u.username, u.email, u.name, u.surname, u.enabled) " +
-            "FROM Member u " +
-            "WHERE u.username LIKE %?1% " +
-            "   OR u.email LIKE %?1% " +
-            "   OR u.name LIKE %?1% " +
-            "   OR u.surname LIKE %?1%")
-    public List<UserUI> searchUsers(String queryString);
-
-    @Query("SELECT m FROM Member m WHERE m.username = ?1")
-    public Member findByUsername(String username);
-
-    public Member findById(long id);
-
+@Getter
+@Setter
+@NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class JwtResponse {
+    private String jwt;
+        
+    @Override
+    public String toString() {
+        return this.jwt;
+    }
 }
