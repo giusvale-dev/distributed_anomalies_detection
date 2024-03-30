@@ -30,6 +30,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -100,4 +101,43 @@ public class UserServiceController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
+
+    @CrossOrigin
+    @PostMapping("/api/user/delete/{id}")
+    @PreAuthorize("hasRole('SUPERADMIN')")
+    public ResponseEntity<String> deleteUser(@PathVariable long id) {
+        
+        try {
+            logger.info("deleteUser()");
+            User u = new User();
+            u.setId(id);
+            MessagePayload mp = new MessagePayload(OperationType.DELETE, u);
+            String response = messageProducer.sendMessage(mp);
+            if (response != null) {
+                ObjectMapper om = new ObjectMapper();
+                ACK<Long> ack = om.readValue(response, new TypeReference<ACK<Long>>() {});
+                if (ack != null) {
+                    if (ack.isSuccess()) {
+                        om = new ObjectMapper();
+                        String bodyResponse = om.writeValueAsString(ack);
+                        return ResponseEntity.status(HttpStatus.OK).body(bodyResponse);    
+                    } else {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ack.getMessage());
+                    }
+                } else {
+                    //ERROR
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Can't complete the operation");
+                }
+            
+            } else {
+                //REQUEST NOT PERFORMED
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("At the moment is not possible satisfy the operation request");
+            }
+
+        } catch(Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    
+    }
+
 }
