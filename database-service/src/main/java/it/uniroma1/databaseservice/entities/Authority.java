@@ -22,6 +22,7 @@ package it.uniroma1.databaseservice.entities;
 
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -53,6 +54,7 @@ public class Authority {
     @JsonProperty(value = "authority")
     private String authorityName;
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "authorities")
     private Set<Member> members;
 

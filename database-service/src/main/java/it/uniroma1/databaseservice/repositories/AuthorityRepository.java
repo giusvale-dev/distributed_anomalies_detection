@@ -20,7 +20,11 @@
 
 package it.uniroma1.databaseservice.repositories;
 
+
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import it.uniroma1.databaseservice.entities.Authority;
 
@@ -29,5 +33,8 @@ public interface AuthorityRepository extends JpaRepository<Authority, Long> {
     public Authority findByAuthorityName(String authorityName);
 
     public Long findIdByAuthorityName(String authorityName);
+
+    @Query("SELECT r.id FROM Authority r WHERE 1 = 1")
+    public List<Long> findAllIdRoles();
 
 }

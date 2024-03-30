@@ -17,111 +17,166 @@
  *SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-
 package it.uniroma1.databaseservice;
 
-
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import it.uniroma1.databaseservice.entities.Authority;
 import it.uniroma1.databaseservice.entities.Member;
+import it.uniroma1.databaseservice.messaging.ACK;
 import it.uniroma1.databaseservice.messaging.MessagePayload;
 import it.uniroma1.databaseservice.messaging.OperationType;
+import it.uniroma1.databaseservice.repositories.AuthorityRepository;
 import it.uniroma1.databaseservice.repositories.MemberRepository;
+import jakarta.transaction.Transactional;
 
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.DirectExchange;
-import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+
+import org.springframework.amqp.core.DirectExchange;
 
 @SpringBootTest
 @ActiveProfiles("dev")
-@Configuration
 public class DatabaseListenerTest {
-
-    @Value("${queue.rabbitmq.listener.name}")
-    private String queueName;
-
-    @Value("${binding.rabbitmq.key}")
-    private String keyBinding;
-
-    @Bean
-    public Queue queue() {
-        return new Queue(queueName, false);
-    }
-
-    @Bean
-    public DirectExchange exchange() {
-        return new DirectExchange("user_exchange");
-    }
-
-    @Bean
-    Binding bindingA(Queue queue, DirectExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with(keyBinding);
-    }
-
-    @Autowired
-    private RabbitTemplate rabbitTemplate;
 
     @Autowired
     private MemberRepository memberRepository;
 
-    
+    @Autowired
+    private AuthorityRepository authorityRepository;
+
+    @Autowired
+    private DirectExchange directExchange;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    @Value("${binding.rabbitmq.key}")
+    private String keyBinding;
 
     @Test
-    public void testUserInsert() throws JsonProcessingException {
-        sendMessage();
-        Member insertedUser = memberRepository.findByUsername("username");
-        assertNotNull(insertedUser);
+    public void testUserInsertWithoutRoles() throws JsonProcessingException {
 
+        Member m = new Member();
+        m.setName("Mario");
+        m.setSurname("Rossi");
+        m.setEmail("mario.rossi@gmail.com");
+        m.setUsername("mariross");
+        m.setPassword("password");
+        m.setEnabled(true);
+
+        // Create a message
+        MessagePayload mp = new MessagePayload();
+        mp.setOperationType(OperationType.INSERT);
+        mp.setUser(m);
+        ObjectMapper om = new ObjectMapper();
+        String jsonMessage = om.writeValueAsString(mp);
+
+        String response = (String) rabbitTemplate.convertSendAndReceive(directExchange.getName(), keyBinding,
+                jsonMessage);
+        assertNotNull(response);
+
+        ACK<Long> ack = om.readValue(response, new TypeReference<ACK<Long>>() {
+        });
+        assertNotNull(ack);
+        assertEquals(true, ack.isSuccess());
+        assertEquals("Ok", ack.getMessage());
+        assertTrue(ack.getPayload() != 0);
+
+        // Check the user in the database
+        Member loadFromDatabase = memberRepository.findById((long) ack.getPayload());
+        assertNotNull(loadFromDatabase);
+        assertEquals("Mario", loadFromDatabase.getName());
+        assertEquals("Rossi", loadFromDatabase.getSurname());
+        assertEquals("mario.rossi@gmail.com", loadFromDatabase.getEmail());
+        assertEquals("mariross", loadFromDatabase.getUsername());
+        assertTrue(m.getAuthorities() == null || m.getAuthorities().size() == 0);
     }
 
+    @Test
+    public void testUserInsertWithRoles() throws JsonProcessingException {
 
-    private String sendMessage() throws JsonProcessingException {
-        
-        MessagePayload payload = new MessagePayload();
+        List<Authority> roles = authorityRepository.findAll();
+        assertNotNull(roles);
 
-        Member userToInset = new Member();
-        userToInset.setEmail("test@email.com");
-        userToInset.setUsername("username");
-        userToInset.setName("name");
-        userToInset.setSurname("surname");
-        userToInset.setEnabled(true);
-        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-        userToInset.setPassword(bCryptPasswordEncoder.encode("password"));
+        Member m = new Member();
+        m.setName("Giuseppe");
+        m.setSurname("Verdi");
+        m.setEmail("giuseppe.verdi@gmail.com");
+        m.setUsername("giusverd");
+        m.setPassword("password");
+        m.setEnabled(true);
 
-        Authority role = new Authority();
-        role.setAuthorityName("ROLE_SUPERADMIN");
-        
         Set<Authority> rolesForUser = new HashSet<Authority>();
-        rolesForUser.add(role);
-        userToInset.setAuthorities(rolesForUser);
-        
-        payload.setOperationType(OperationType.INSERT);
-        payload.setUser(userToInset);
+        rolesForUser.addAll(roles);
+        assertEquals(roles.size(), rolesForUser.size());
+        m.setAuthorities(rolesForUser);
+
+        // Create a message
+        MessagePayload mp = new MessagePayload();
+        mp.setOperationType(OperationType.INSERT);
+        mp.setUser(m);
+        ObjectMapper om = new ObjectMapper();
+        String jsonMessage = om.writeValueAsString(mp);
+
+        String response = (String) rabbitTemplate.convertSendAndReceive(directExchange.getName(), keyBinding,
+                jsonMessage);
+        assertNotNull(response);
+
+        ACK<Long> ack = om.readValue(response, new TypeReference<ACK<Long>>() {
+        });
+        assertNotNull(ack);
+        assertEquals(true, ack.isSuccess());
+        assertEquals("Ok", ack.getMessage());
+        assertTrue(ack.getPayload() != 0);
+
+        // Check the user in the database
+        Member loadFromDatabase = memberRepository.findById((long) ack.getPayload());
+        assertNotNull(loadFromDatabase);
+        assertEquals("Giuseppe", loadFromDatabase.getName());
+        assertEquals("Verdi", loadFromDatabase.getSurname());
+        assertEquals("giuseppe.verdi@gmail.com", loadFromDatabase.getEmail());
+        assertEquals("giusverd", loadFromDatabase.getUsername());
+        assertTrue(m.getAuthorities() != null && m.getAuthorities().size() == rolesForUser.size());
+    }
+
+    @Test
+    @Transactional
+    public void testDeleteUser() throws JsonProcessingException {
+
+        // Create a message
+        MessagePayload mp = new MessagePayload();
+        mp.setOperationType(OperationType.DELETE);
+        Member userFromController = new Member();
+        long id = memberRepository.findByUsername("disabledUser").getId();
+        userFromController.setId(id);
+        mp.setUser(userFromController);
 
         ObjectMapper om = new ObjectMapper();
-        String jsonMessage = om.writeValueAsString(payload);
-        String response = (String) rabbitTemplate.convertSendAndReceive(exchange().getName(), keyBinding, jsonMessage);
-        return response;
-    }
+        String jsonMessage = om.writeValueAsString(mp);
 
+        String response = (String) rabbitTemplate.convertSendAndReceive(directExchange.getName(), keyBinding,
+                jsonMessage);
+        assertNotNull(response);
+
+        ACK<Object> ack = om.readValue(response, new TypeReference<ACK<Object>>() {});
+        assertNotNull(ack);
+        assertEquals(true, ack.isSuccess());
+        
+    }
 
 }

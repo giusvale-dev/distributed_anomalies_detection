@@ -46,53 +46,32 @@ public class MessageListener {
     @Autowired
     private AuthorityRepository authorityRepository;
 
-    @RabbitListener(queues = {"${queue.rabbitmq.listener.name}"})
+    @RabbitListener(queues = { "${queue.rabbitmq.listener.name}" })
     @SendTo("user_exchange/${binding.rabbitmq.key}")
-    @Transactional
     public String receiveMessage(String message) throws JsonProcessingException {
 
-        ACK<Long> replyMessage = new ACK<Long>();
+        ACK<Object> replyMessage = new ACK<Object>();
         String response = "";
         try {
-            if(message != null) {
+            if (message != null) {
                 ObjectMapper om = new ObjectMapper();
-                MessagePayload mp = null;
-                mp = (MessagePayload) om.readValue(message, MessagePayload.class);
-                if(mp != null) {        
-                    switch(mp.getOperationType()) {
+                MessagePayload mp = (MessagePayload) om.readValue(message, MessagePayload.class);
+                Member m = null;
+                if (mp != null) {
+                    switch (mp.getOperationType()) {
                         case INSERT:
-                            Member m = mp.getUser();
-                            //Insert the member if it doesn't exist
-                            if(memberRepository.findByUsername(m.getUsername()) == null) {
-                                BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-                                m.setPassword(bCryptPasswordEncoder.encode(m.getPassword()));
-                                Set<Authority> roles = Collections.synchronizedSet(new HashSet<Authority>());
-                                if(m.getAuthorities() != null && !m.getAuthorities().isEmpty()) {
-                                    for(Authority a : m.getAuthorities()) {
-                                        if(a != null && a.getAuthorityName() != null) {
-                                            a = authorityRepository.findByAuthorityName(a.getAuthorityName().toUpperCase());
-                                        }
-                                        if(a != null) {
-                                            roles.add(a);
-                                        }
-                                    }
-                                }
-                                m.setAuthorities(roles);
-                                m = memberRepository.save(m);
-                                replyMessage.setMessage("Ok");
-                                replyMessage.setPayload(m.getId());
-                                replyMessage.setSuccess(true);
-                            } else {
-                                replyMessage.setMessage("User exist");
-                                replyMessage.setPayload(0L);
-                                replyMessage.setSuccess(false);
-                            }
-                        break;
+                            m = mp.getUser();
+                            replyMessage = insertMember(m);
+                            break;
+                        case DELETE:
+                            m = mp.getUser();
+                            replyMessage = deleteMember(m.getId());
+                            break;
                         default:
                             replyMessage.setMessage("Operation not supported");
                             replyMessage.setPayload(0L);
                             replyMessage.setSuccess(false);
-                        break;
+                            break;
                     }
                 } else {
                     replyMessage.setMessage("Unparsable message");
@@ -104,8 +83,8 @@ public class MessageListener {
                 replyMessage.setPayload(0L);
                 replyMessage.setSuccess(false);
             }
-        
-        } catch(Exception e) {
+
+        } catch (Exception e) {
             replyMessage.setMessage(e.getMessage());
             replyMessage.setPayload(0L);
             replyMessage.setSuccess(false);
@@ -114,7 +93,81 @@ public class MessageListener {
             response = om.writeValueAsString(replyMessage);
         }
 
-        //Send back the ACK
+        // Send back the ACK
         return response;
+    }
+
+    /**
+     * Private method to insert the user in the database, then build the ACK message
+     * 
+     * @param m the member to insert
+     * @return the ACK related to the insert operation
+     * @throws Exception 
+     */
+    @Transactional
+    private ACK<Object> insertMember(Member m) throws Exception {
+
+        ACK<Object> replyMessage = new ACK<Object>();
+        try {
+            // Insert the member if it doesn't exist
+            if (memberRepository.findByUsername(m.getUsername()) == null) {
+                BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+                m.setPassword(bCryptPasswordEncoder.encode(m.getPassword()));
+                Set<Authority> roles = Collections.synchronizedSet(new HashSet<Authority>());
+                if (m.getAuthorities() != null && !m.getAuthorities().isEmpty()) {
+                    for (Authority a : m.getAuthorities()) {
+                        if (a != null && a.getAuthorityName() != null) {
+                            a = authorityRepository
+                                    .findByAuthorityName(a.getAuthorityName().toUpperCase());
+                        }
+                        if (a != null) {
+                            roles.add(a);
+                        }
+                    }
+                }
+                m.setAuthorities(roles);
+                m = memberRepository.save(m);
+                replyMessage.setMessage("Ok");
+                replyMessage.setPayload(m.getId());
+                replyMessage.setSuccess(true);
+            } else {
+                replyMessage.setMessage("User exist");
+                replyMessage.setPayload(0L);
+                replyMessage.setSuccess(false);
+            }
+            return replyMessage;
+
+        } catch(Exception e) {
+            //Raise the exception to the caller to manage it
+            throw new Exception(e);
+        } 
+    }
+
+    @Transactional
+    private ACK<Object> deleteMember(long id) throws Exception {
+
+        try {
+            ACK<Object> replyMessage = new ACK<Object>();
+            Member m = memberRepository.findById(id);
+            if(m != null) {
+
+                String username = m.getUsername();
+                memberRepository.delete(m);
+                replyMessage.setMessage(String.format("User %s deleted", username));
+                replyMessage.setSuccess(true);
+                replyMessage.setPayload(null);
+
+            } else {
+                replyMessage.setMessage("User does not exist");
+                replyMessage.setSuccess(false);
+                replyMessage.setPayload(null);
+            }
+            return replyMessage;
+
+
+        } catch(Exception e) {
+            //Raise the exception to the caller to manage it
+            throw new Exception(e);
+        }
     }
 }
