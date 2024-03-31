@@ -3,8 +3,7 @@
 <p-card
   title="users"
   header="Users"
-  class="flex-1 flex align-items-center justify-content-center text-center"
-  [style]="{ width: '70rem' }"
+  class="align-items-center justify-content-center text-center"
 >
   <div class="card">
     <p-table
@@ -27,10 +26,10 @@
             {{ rowData.id }}
           </td>
           <td>
-            {{ rowData.firstName }}
+            {{ rowData.name }}
           </td>
           <td>
-            {{ rowData.lastName }}
+            {{ rowData.surname }}
           </td>
           <td>
             {{ rowData.username }}

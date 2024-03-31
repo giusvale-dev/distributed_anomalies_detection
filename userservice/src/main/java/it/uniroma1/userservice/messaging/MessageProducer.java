@@ -31,7 +31,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import it.uniroma1.userservice.InvalidInputParameter;
-import it.uniroma1.userservice.entities.User;
 
 @Service
 public class MessageProducer {
@@ -50,52 +49,13 @@ public class MessageProducer {
     public String sendMessage(MessagePayload payload) throws InvalidInputParameter, JsonProcessingException {
         
         if(payload != null) {     
-            boolean isValidUser = userValidator(payload.getUser());
-            if(isValidUser) {
-                ObjectMapper om = new ObjectMapper();
-                String jsonMessage = om.writeValueAsString(payload);
-                String response = (String) rabbitTemplate.convertSendAndReceive(directExchange.getName(), keyBinding, jsonMessage);
-                return response;
-            } else {
-                throw new InvalidInputParameter("User is not valid");
-            }
+            
+            ObjectMapper om = new ObjectMapper();
+            String jsonMessage = om.writeValueAsString(payload);
+            String response = (String) rabbitTemplate.convertSendAndReceive(directExchange.getName(), keyBinding, jsonMessage);
+            return response;
+            
         }
         return null;
     }
-
-    private boolean userValidator(User u) {
-        
-        if(u != null) {
-            //Username not valid
-            if(u.getUsername() == null || u.getUsername().trim().equals("")) {
-                return false;
-            }
-
-            //Password not valid
-            if(u.getPassword() == null || u.getPassword().trim().equals("")) {
-                return false;
-            }
-
-            //Email
-            if(u.getEmail() == null || u.getEmail().trim().equals("")) {
-                return false;
-            }
-
-            //Name
-            if(u.getName() == null || u.getName().trim().equals("")) {
-                return false;
-            }
-
-            //Surname
-            if(u.getSurname() == null || u.getSurname().trim().equals("")) {
-                return false;
-            }
-            return true;
-        }
-        return false;
-    }
-
-
-
-
 }

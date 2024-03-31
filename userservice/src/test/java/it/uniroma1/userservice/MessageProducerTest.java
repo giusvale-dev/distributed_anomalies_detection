@@ -20,7 +20,6 @@ package it.uniroma1.userservice;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -72,7 +71,7 @@ public class MessageProducerTest {
         roles.add(r2);
         u.setAuthorities(roles);
 
-        MessagePayload mp = new MessagePayload(OperationType.INSERT, u);
+        MessagePayload mp = new MessagePayload(OperationType.INSERT, u, null);
 
         String response = messageProducer.sendMessage(mp);
         assertNotNull(response);
@@ -87,119 +86,6 @@ public class MessageProducerTest {
             
     }
 
-    @Test
-    public void testNullEmail() throws JsonProcessingException, InvalidInputParameter {
-        User u = new User();
-        u.setEmail(null);
-        u.setEnabled(true);
-        u.setId(54L);
-        u.setName("Name");
-        u.setSurname("Surname");
-        u.setUsername("username");
-        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-        u.setPassword(bCryptPasswordEncoder.encode("aaa"));
-        Role r1 = new Role();
-        Role r2 = new Role();
-        r1.setAuthority("SYSTEM_ADMINISTRATOR");
-        r2.setAuthority("SUPERADMIN");
-        Set<Role> roles = new HashSet<Role>();
-        roles.add(r1);
-        roles.add(r2);
-        u.setAuthorities(roles);
-        MessagePayload mp = new MessagePayload(OperationType.INSERT, u);
-        assertThrows(InvalidInputParameter.class, () -> messageProducer.sendMessage(mp));      
-    }
-
-    @Test
-    public void testNullUsername() throws JsonProcessingException, InvalidInputParameter {
-        User u = new User();
-        u.setEmail("Email");
-        u.setEnabled(true);
-        u.setId(54L);
-        u.setName("Name");
-        u.setSurname("Surname");
-        u.setUsername(null);
-        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-        u.setPassword(bCryptPasswordEncoder.encode("aaa"));
-        Role r1 = new Role();
-        Role r2 = new Role();
-        r1.setAuthority("SYSTEM_ADMINISTRATOR");
-        r2.setAuthority("SUPERADMIN");
-        Set<Role> roles = new HashSet<Role>();
-        roles.add(r1);
-        roles.add(r2);
-        u.setAuthorities(roles);
-        MessagePayload mp = new MessagePayload(OperationType.INSERT, u);
-        assertThrows(InvalidInputParameter.class, () -> messageProducer.sendMessage(mp));      
-    }
-
-    @Test
-    public void testNullPassword() throws JsonProcessingException, InvalidInputParameter {
-        User u = new User();
-        u.setEmail("Email");
-        u.setEnabled(true);
-        u.setId(54L);
-        u.setName("Name");
-        u.setSurname("Surname");
-        u.setUsername("username");
-        u.setPassword(null);
-        Role r1 = new Role();
-        Role r2 = new Role();
-        r1.setAuthority("SYSTEM_ADMINISTRATOR");
-        r2.setAuthority("SUPERADMIN");
-        Set<Role> roles = new HashSet<Role>();
-        roles.add(r1);
-        roles.add(r2);
-        u.setAuthorities(roles);
-        MessagePayload mp = new MessagePayload(OperationType.INSERT, u);
-        assertThrows(InvalidInputParameter.class, () -> messageProducer.sendMessage(mp));      
-    }
-
-    @Test
-    public void testNullName() throws JsonProcessingException, InvalidInputParameter {
-        User u = new User();
-        u.setEmail("Email");
-        u.setEnabled(true);
-        u.setId(54L);
-        u.setName(null);
-        u.setSurname("Surname");
-        u.setUsername("username");
-        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-        u.setPassword(bCryptPasswordEncoder.encode("aaa"));
-        Role r1 = new Role();
-        Role r2 = new Role();
-        r1.setAuthority("SYSTEM_ADMINISTRATOR");
-        r2.setAuthority("SUPERADMIN");
-        Set<Role> roles = new HashSet<Role>();
-        roles.add(r1);
-        roles.add(r2);
-        u.setAuthorities(roles);
-        MessagePayload mp = new MessagePayload(OperationType.INSERT, u);
-        assertThrows(InvalidInputParameter.class, () -> messageProducer.sendMessage(mp));      
-    }
-
-    @Test
-    public void testNullSurname() throws JsonProcessingException, InvalidInputParameter {
-        User u = new User();
-        u.setEmail("Email");
-        u.setEnabled(true);
-        u.setId(54L);
-        u.setName("Name");
-        u.setSurname(null);
-        u.setUsername("username");
-        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-        u.setPassword(bCryptPasswordEncoder.encode("aaa"));
-        Role r1 = new Role();
-        Role r2 = new Role();
-        r1.setAuthority("SYSTEM_ADMINISTRATOR");
-        r2.setAuthority("SUPERADMIN");
-        Set<Role> roles = new HashSet<Role>();
-        roles.add(r1);
-        roles.add(r2);
-        u.setAuthorities(roles);
-        MessagePayload mp = new MessagePayload(OperationType.INSERT, u);
-        assertThrows(InvalidInputParameter.class, () -> messageProducer.sendMessage(mp));      
-    }
 
     /**
      * Simulate a message consumer, and sand back the message received to the

@@ -30,9 +30,9 @@ import it.uniroma1.databaseservice.entities.models.UserUI;
 
 public interface MemberRepository extends JpaRepository<Member, Long>{
 
-    @Query("SELECT NEW it.uniroma1.databaseservice.entities.models.UserUI(u.id, u.username, u.email, u.name, u.surname, u.enabled) " +
+    @Query("SELECT NEW it.uniroma1.databaseservice.entities.models.UserUI(u.id, u.username, u.email, u.name, u.surname, u.enabled)" +
             "FROM Member u " +
-            "WHERE u.username LIKE %?1% " +
+            "WHERE u.username LIKE %?1%" +
             "   OR u.email LIKE %?1% " +
             "   OR u.name LIKE %?1% " +
             "   OR u.surname LIKE %?1%")
@@ -48,5 +48,12 @@ public interface MemberRepository extends JpaRepository<Member, Long>{
     public Member findByUsername(String username);
 
     public Member findById(long id);
+
+    @Query("SELECT a.authorityName " +
+           "FROM Member u " +
+           "INNER JOIN u.authorities a " +
+           "WHERE u.id = ?1"
+    )
+    public List<String> rolesForUserId(long userId);
 
 }

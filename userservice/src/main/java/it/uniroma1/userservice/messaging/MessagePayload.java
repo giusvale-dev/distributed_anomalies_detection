@@ -34,5 +34,6 @@ public class MessagePayload {
 
     private OperationType operationType;
     private User user;
+    private String searchString;
     
 }

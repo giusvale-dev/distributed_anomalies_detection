@@ -87,19 +87,16 @@ public class JwtFilter extends OncePerRequestFilter {
             if(!isPublicUrl(request)) {
                 String token = extractToken(request.getHeader("Authorization"));
                 if(token != null) {
-                    logger.info(token);
                     //1. Check token signature and extract all information
                     Claims claims = jwtUtil.extractAllClaims(token);
                     //2. Check if the token is not expired
                     boolean isTokenExpired = jwtUtil.isTokenExpired(token);
                     //3. Create the user and insert into Security Context
                     if(!isTokenExpired && claims != null) {
-                        logger.info("xxxx");
                         User u = createUserbyClaims(claims);
                         if(u != null) {
                                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(u.getUsername(), null, u.getAuthorities());
                                SecurityContextHolder.getContext().setAuthentication(auth); //Authenticate the user
-                               logger.info("yyyy");
                         }
                     } else {
                         SecurityContextHolder.clearContext();

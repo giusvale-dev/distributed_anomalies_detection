@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -71,7 +72,7 @@ public class UserServiceController {
         try {
             logger.info("inserUser()");
             User u = userModel.toUser();
-            MessagePayload mp = new MessagePayload(OperationType.INSERT, u);
+            MessagePayload mp = new MessagePayload(OperationType.INSERT, u, null);
             String response = messageProducer.sendMessage(mp);
             if (response != null) {
                 //ACK RECEIVED
@@ -111,7 +112,7 @@ public class UserServiceController {
             logger.info("deleteUser()");
             User u = new User();
             u.setId(id);
-            MessagePayload mp = new MessagePayload(OperationType.DELETE, u);
+            MessagePayload mp = new MessagePayload(OperationType.DELETE, u, null);
             String response = messageProducer.sendMessage(mp);
             if (response != null) {
                 ObjectMapper om = new ObjectMapper();
@@ -138,6 +139,40 @@ public class UserServiceController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }    
     }
-    
 
+    @CrossOrigin(origins = "*")
+    @GetMapping("/api/user/view")
+    @PreAuthorize("hasRole('SUPERADMIN')")
+    public ResponseEntity<String> viewUsers(@RequestParam(required = false) String searchString) {
+        
+        try {
+            logger.info("viewUsers()");
+            MessagePayload mp = new MessagePayload();
+            mp.setOperationType(OperationType.SEARCH);
+            mp.setSearchString(searchString);
+            String response = messageProducer.sendMessage(mp);
+            if (response != null) {
+                ObjectMapper om = new ObjectMapper();
+                ACK<Object> ack = om.readValue(response, new TypeReference<ACK<Object>>() {});
+                if (ack != null) {
+                    if (ack.isSuccess()) {
+                        om = new ObjectMapper();
+                        String bodyResponse = om.writeValueAsString(ack.getPayload());
+                        return ResponseEntity.status(HttpStatus.OK).body(bodyResponse);    
+                    } else {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ack.getMessage());
+                    }
+                } else {
+                    //ERROR
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Can't complete the operation");
+                }
+            
+            } else {
+                //REQUEST NOT PERFORMED
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("At the moment is not possible satisfy the operation request");
+            }
+        } catch(Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }  
+    }
 }

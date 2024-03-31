@@ -200,6 +200,17 @@ public class MessageListener {
                 searchResult = memberRepository.searchUsers(searchString);
             }
 
+            //Adding roles name to the response
+            //TODO: This query should be optimized, now is very slow
+            if (searchResult != null) {
+                searchResult.forEach(userUI -> {
+                    if(userUI != null) {
+                        List<String> rolesForUser = memberRepository.rolesForUserId(userUI.getId());
+                        userUI.setRoles(rolesForUser);
+                    }
+                });
+            }
+
             replyMessage.setSuccess(true);
             replyMessage.setMessage("Ok");
             replyMessage.setPayload(searchResult);

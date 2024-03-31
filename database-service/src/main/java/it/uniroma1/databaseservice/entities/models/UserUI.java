@@ -20,6 +20,10 @@
 
 package it.uniroma1.databaseservice.entities.models;
 
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,6 +33,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UserUI {
 
     private Long id;
@@ -37,6 +42,14 @@ public class UserUI {
     private String name;
     private String surname;
     private boolean enabled;
+    private List<String> roles;
 
-
+    public UserUI(Long id, String username, String email, String name, String surname, boolean enabled) {
+        this.id = id;
+        this.username = username;
+        this.name = name;
+        this.surname = surname;
+        this.enabled = enabled;
+        this.email = email;
+    }
 }

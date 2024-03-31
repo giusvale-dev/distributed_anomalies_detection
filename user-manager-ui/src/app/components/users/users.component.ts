@@ -24,6 +24,7 @@ export class UsersComponent  {
   constructor(private userService: UserService, private router: Router,private confirmationService: ConfirmationService, private messageService: MessageService) {}
 
   ngOnInit(): void{
+
     this.cols = [
       { field: 'id', header: 'ID'},
       { field: 'firstName', header: 'Name'},
@@ -35,7 +36,7 @@ export class UsersComponent  {
     ]
     this.resp = this.userService.getUsers(`${environment.usersUrl}`).subscribe({
       next: (data: any) => {
-        this.users = data.users
+        this.users = data
         
       }
     })
