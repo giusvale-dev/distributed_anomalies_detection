@@ -14,5 +14,6 @@ public class MessagePayload {
 
     private OperationType operationType;
     private Member user;
+    private String searchString;
     
 }

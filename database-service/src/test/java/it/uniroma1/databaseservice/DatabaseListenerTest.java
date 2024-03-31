@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -38,6 +39,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import it.uniroma1.databaseservice.entities.Authority;
 import it.uniroma1.databaseservice.entities.Member;
+import it.uniroma1.databaseservice.entities.models.UserUI;
 import it.uniroma1.databaseservice.messaging.ACK;
 import it.uniroma1.databaseservice.messaging.MessagePayload;
 import it.uniroma1.databaseservice.messaging.OperationType;
@@ -176,6 +178,90 @@ public class DatabaseListenerTest {
         ACK<Object> ack = om.readValue(response, new TypeReference<ACK<Object>>() {});
         assertNotNull(ack);
         assertEquals(true, ack.isSuccess());
+        
+    }
+
+    @Test
+    public void testLoadUsersWithoutSearchString() throws JsonProcessingException {
+
+        MessagePayload mp = new MessagePayload();
+        mp.setOperationType(OperationType.SEARCH);
+        mp.setSearchString(null);
+        mp.setUser(null);
+
+        ObjectMapper om = new ObjectMapper();
+        String jsonMessage = om.writeValueAsString(mp);
+
+        String response = (String) rabbitTemplate.convertSendAndReceive(directExchange.getName(), keyBinding,
+                jsonMessage);
+        assertNotNull(response);
+
+        ACK<List<UserUI>> ack = om.readValue(response, new TypeReference<ACK<List<UserUI>>>() {});
+
+        List<UserUI> listUnderTest = ack.getPayload();
+        assertNotNull(listUnderTest);
+
+        List<Member> trustedList = memberRepository.findAll();
+        assertNotNull(trustedList);
+
+        assertEquals(trustedList.size(), listUnderTest.size());
+
+        //Check the lists containing the same elements
+        List<Long> trustedIdList = new ArrayList<Long>();
+        trustedList.forEach(m -> {
+            assertNotNull(m);
+            trustedIdList.add(m.getId());
+        });
+
+        List<Long> underTestIdList = new ArrayList<Long>();
+        listUnderTest.forEach(m -> {
+            assertNotNull(m);
+            underTestIdList.add(m.getId());
+        });
+
+        assertTrue(underTestIdList.containsAll(trustedIdList));
+    }
+
+    @Test
+    public void testLoadUsersWithSearchString() throws JsonProcessingException {
+
+        MessagePayload mp = new MessagePayload();
+        mp.setOperationType(OperationType.SEARCH);
+        mp.setSearchString("gr");
+        mp.setUser(null);
+
+        ObjectMapper om = new ObjectMapper();
+        String jsonMessage = om.writeValueAsString(mp);
+
+        String response = (String) rabbitTemplate.convertSendAndReceive(directExchange.getName(), keyBinding,
+                jsonMessage);
+        assertNotNull(response);
+
+        ACK<List<UserUI>> ack = om.readValue(response, new TypeReference<ACK<List<UserUI>>>() {});
+
+        List<UserUI> listUnderTest = ack.getPayload();
+        assertNotNull(listUnderTest);
+
+        listUnderTest.forEach(m -> {
+            assertNotNull(m);
+            assertNotNull(m.getEmail());
+            assertNotNull(m.getUsername());
+            assertNotNull(m.getName());
+            assertNotNull(m.getSurname());
+            
+            boolean containSearchedString = m.getEmail().contains("gr") ||
+                                            m.getUsername().contains("gr") ||
+                                            m.getName().contains("gr") ||
+                                            m.getSurname().contains("gr");
+            
+            assertTrue(containSearchedString);
+
+        });
+
+
+
+
+
         
     }
 

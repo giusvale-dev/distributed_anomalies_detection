@@ -20,6 +20,7 @@ package it.uniroma1.databaseservice.messaging;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -33,6 +34,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import it.uniroma1.databaseservice.entities.Authority;
 import it.uniroma1.databaseservice.entities.Member;
+import it.uniroma1.databaseservice.entities.models.UserUI;
 import it.uniroma1.databaseservice.repositories.AuthorityRepository;
 import it.uniroma1.databaseservice.repositories.MemberRepository;
 import jakarta.transaction.Transactional;
@@ -66,6 +68,9 @@ public class MessageListener {
                         case DELETE:
                             m = mp.getUser();
                             replyMessage = deleteMember(m.getId());
+                            break;
+                        case SEARCH:
+                            replyMessage = searchMembers(mp.getSearchString());
                             break;
                         default:
                             replyMessage.setMessage("Operation not supported");
@@ -164,6 +169,42 @@ public class MessageListener {
             }
             return replyMessage;
 
+
+        } catch(Exception e) {
+            //Raise the exception to the caller to manage it
+            throw new Exception(e);
+        }
+    }
+
+    /**
+     * Return the list of the members with the criterias related to the searchString.
+     * If the searchString is null all data is recovered by database.
+     * This method doesn't offer any optimization (for example pagination)
+     * The purpose is only for academic demostration, in a real world scenario
+     * is needed optimize the search in some ways (pagination, query optimization, index search, etc.)
+     * 
+     * To avoid to load the enteire database with JPA the search result is wrapped into an POJO (no entity)
+     * 
+     * @param searchString The string to search in database (can be null)
+     * @return The list of the searched items
+     * @throws Exception
+     */
+    private ACK<Object> searchMembers(String searchString) throws Exception {
+        ACK<Object> replyMessage = new ACK<Object>();
+        List<UserUI> searchResult;
+        try {
+
+            if(searchString == null || searchString.trim().isEmpty()) {
+                searchResult = memberRepository.findAllUsers();
+            } else {
+                searchResult = memberRepository.searchUsers(searchString);
+            }
+
+            replyMessage.setSuccess(true);
+            replyMessage.setMessage("Ok");
+            replyMessage.setPayload(searchResult);
+
+            return replyMessage;
 
         } catch(Exception e) {
             //Raise the exception to the caller to manage it

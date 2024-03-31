@@ -38,6 +38,12 @@ public interface MemberRepository extends JpaRepository<Member, Long>{
             "   OR u.surname LIKE %?1%")
     public List<UserUI> searchUsers(String queryString);
 
+    @Query("SELECT NEW it.uniroma1.databaseservice.entities.models.UserUI(u.id, u.username, u.email, u.name, u.surname, u.enabled) " +
+            "FROM Member u " +
+            "WHERE 1 = 1")
+    public List<UserUI> findAllUsers();
+
+
     @Query("SELECT m FROM Member m WHERE m.username = ?1")
     public Member findByUsername(String username);
 
