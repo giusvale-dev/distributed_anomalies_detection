@@ -21,7 +21,11 @@ export class UsersComponent  {
   cols: Column[];
   resp: any;
 
-  constructor(private userService: UserService, private router: Router,private confirmationService: ConfirmationService, private messageService: MessageService) {}
+  constructor(
+  private userService: UserService,
+  private router: Router,
+  private confirmationService: ConfirmationService,
+  private messageService: MessageService) {}
 
   ngOnInit(): void{
 
@@ -37,22 +41,30 @@ export class UsersComponent  {
     this.resp = this.userService.getUsers(`${environment.usersUrl}`).subscribe({
       next: (data: any) => {
         this.users = data
-        
       }
     })
   }
 
-  onClick(){
-    this.router.navigateByUrl('users/edit')
+  onClick(id : string){
+    this.router.navigateByUrl(`${environment.editUserUrl}` + `/${id}`)
   }
-  confirm2(event: Event) {
+
+  confirm2(event: Event, id: string) {
     this.confirmationService.confirm({
         target: event.target as EventTarget,
         message: 'Do you want to delete this record?',
         icon: 'pi pi-info-circle',
         acceptButtonStyleClass: 'p-button-danger p-button-sm',
         accept: () => {
-            this.messageService.add({ severity: 'info', summary: 'Confirmed', detail: 'Record deleted', life: 3000 });
+            this.userService.deleteUser(id).subscribe({
+              next: (data: any) => {
+                this.messageService.add({ severity: 'info', summary: 'Confirmed', detail: 'Record deleted', life: 3000 });
+              },
+              error: (err) => {
+                this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Could not process request, try again later', life: 3000 });
+              }
+            })
+            
         },
         reject: () => {
             this.messageService.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });

@@ -23,6 +23,7 @@ export class MenuBarComponent {
         items: [
           {
             label: 'View users',
+            routerLink: ['/users'],
             icon: 'pi pi-fw pi-search',
           },
           {
@@ -38,6 +39,7 @@ export class MenuBarComponent {
         items: [
           {
             label: 'Manage hosts',
+            routerLink: [''],
             icon: 'pi pi-fw pi-align-left',
           },
         ]
