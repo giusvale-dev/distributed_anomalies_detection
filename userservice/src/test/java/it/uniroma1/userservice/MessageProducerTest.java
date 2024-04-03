@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -44,6 +45,7 @@ import it.uniroma1.userservice.messaging.MessagePayload;
 import it.uniroma1.userservice.messaging.MessageProducer;
 
 @SpringBootTest
+@ActiveProfiles("dev")
 public class MessageProducerTest {
 
     @Autowired
