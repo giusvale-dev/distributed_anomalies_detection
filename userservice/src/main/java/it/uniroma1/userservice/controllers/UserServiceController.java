@@ -65,7 +65,7 @@ public class UserServiceController {
         }
     }
 
-    @CrossOrigin
+    @CrossOrigin(origins = "*")
     @PostMapping("/api/user/insert")
     @PreAuthorize("hasRole('SUPERADMIN')")
     public ResponseEntity<String> insertUser(@Valid @RequestBody UserInsertModel userModel) {
@@ -103,7 +103,7 @@ public class UserServiceController {
         }
     }
 
-    @CrossOrigin
+    @CrossOrigin(origins = "*")
     @PostMapping("/api/user/delete/{id}")
     @PreAuthorize("hasRole('SUPERADMIN')")
     public ResponseEntity<String> deleteUser(@PathVariable long id) {
