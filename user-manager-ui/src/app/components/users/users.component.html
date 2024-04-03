@@ -48,7 +48,7 @@
               icon="pi pi-user-edit"
               class="p-button-rounded p-button-outlined  ml-1 mr-2 "
               [style]="{ width: '1.6rem', height: '1.5rem' }"
-              (click)="onClick()"
+              (click)="onClick(rowData.id)"
             ></button>
             <p-toast></p-toast>
             <p-confirmPopup></p-confirmPopup>
@@ -59,7 +59,7 @@
               icon="pi pi-trash"
               class="p-button-rounded p-button-outlined p-button-danger "
               [style]="{ width: '1.6rem', height: '1.5rem' }"
-              (click)="confirm2($event)"
+              (click)="cofirmDeleteDialog($event, rowData.id)"
             ></button>
           </td>
         </tr>

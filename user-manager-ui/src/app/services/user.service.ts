@@ -37,4 +37,11 @@ export class UserService {
     const addUserUrl = environment.addUser;
     return this.http.post(`${environment.editUserUrl}`+ `/${ id }`,editUserForm.value, httpOptions);
   }
+  
+  deleteUser(id: string){
+    const httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+    };
+    return this.http.post(`${environment.deleteUser}`+ `/${ id }`, httpOptions);
+  }
 }
