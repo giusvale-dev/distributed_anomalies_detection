@@ -40,6 +40,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -51,6 +53,7 @@ import it.uniroma1.userservice.entities.User;
 import it.uniroma1.userservice.security.JwtUtil;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("dev")
 public class UserControllerTest {
     
     @LocalServerPort

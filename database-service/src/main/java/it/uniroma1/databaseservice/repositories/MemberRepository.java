@@ -56,4 +56,7 @@ public interface MemberRepository extends JpaRepository<Member, Long>{
     )
     public List<String> rolesForUserId(long userId);
 
+    @Query("SELECT m.id FROM Member m WHERE m.username = ?1")
+    public long loadMemberIdByUsername(String username);
+
 }

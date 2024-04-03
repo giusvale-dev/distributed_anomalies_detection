@@ -32,9 +32,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import it.uniroma1.databaseservice.entities.Authority;
@@ -257,12 +259,54 @@ public class DatabaseListenerTest {
             assertTrue(containSearchedString);
 
         });
-
-
-
-
-
         
     }
+
+    @Test
+    @Transactional
+    public void testUpdateMember() throws JsonMappingException, JsonProcessingException {
+
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        
+        long idMember = memberRepository.loadMemberIdByUsername("systemAdminUser");
+
+        Member m = new Member();
+        m.setId(idMember);
+        m.setName("EditedName");
+        m.setSurname("EditedSurname");
+        m.setEmail("edited_email@gmail.com");
+        m.setUsername("editedUsername");
+        m.setPassword("edited_password");
+        m.setEnabled(false);
+        m.setAuthorities(null);
+        // Create a message
+        MessagePayload mp = new MessagePayload();
+        mp.setOperationType(OperationType.UPDATE);
+        mp.setUser(m);
+        ObjectMapper om = new ObjectMapper();
+        String jsonMessage = om.writeValueAsString(mp);
+
+        String response = (String) rabbitTemplate.convertSendAndReceive(directExchange.getName(), keyBinding, jsonMessage);
+        assertNotNull(response);
+
+        ACK<Long> ack = om.readValue(response, new TypeReference<ACK<Long>>() {});
+        assertNotNull(ack);
+        assertEquals(true, ack.isSuccess());
+        assertEquals("Ok", ack.getMessage());
+        assertEquals(ack.getPayload(), idMember);
+
+        //Load the user from the database
+        Member editedUser = memberRepository.findById(idMember);
+        assertNotNull(editedUser);
+        assertEquals("EditedName", editedUser.getName());
+        assertEquals("EditedSurname", editedUser.getSurname());
+        assertEquals("edited_email@gmail.com", editedUser.getEmail());
+        assertEquals("systemAdminUser", editedUser.getUsername()); //username does not edited
+        assertEquals(false, editedUser.getEnabled());
+        assertTrue(editedUser.getAuthorities() == null || editedUser.getAuthorities().size() == 0);
+        assertTrue(bCryptPasswordEncoder.matches("edited_password", editedUser.getPassword()));
+    
+    }
+
 
 }

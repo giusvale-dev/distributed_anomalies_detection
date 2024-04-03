@@ -72,6 +72,9 @@ public class MessageListener {
                         case SEARCH:
                             replyMessage = searchMembers(mp.getSearchString());
                             break;
+                        case UPDATE:
+                            replyMessage = updateMember(mp.getUser());
+                            break;
                         default:
                             replyMessage.setMessage("Operation not supported");
                             replyMessage.setPayload(0L);
@@ -101,6 +104,59 @@ public class MessageListener {
         // Send back the ACK
         return response;
     }
+
+    
+    /**
+     * Private method to update a user in the database
+     * @throws Exception 
+     */
+    @Transactional
+    private ACK<Object> updateMember(Member m) throws Exception {
+        
+        ACK<Object> replyMessage = new ACK<Object>();
+
+        try {
+
+            Member userToEdit = null;
+            BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+            if(m != null) {
+                userToEdit =  memberRepository.findById(m.getId()).get();
+                if (userToEdit != null) {
+
+                    //Retrieve the editable information
+                    userToEdit.setAuthorities(m.getAuthorities());
+                    userToEdit.setEmail(m.getEmail());
+                    userToEdit.setEnabled(m.getEnabled());
+                    userToEdit.setName(m.getName());
+                    if(m.getPassword() != null) {
+                        userToEdit.setPassword(bCryptPasswordEncoder.encode(m.getPassword()));
+                    }
+                    userToEdit.setSurname(m.getSurname());
+                    memberRepository.save(userToEdit);
+                    
+                    replyMessage.setMessage("Ok");
+                    replyMessage.setPayload(m.getId());
+                    replyMessage.setSuccess(true);
+
+                } else {
+                    replyMessage.setMessage("User does not exist");
+                    replyMessage.setPayload(0L);
+                    replyMessage.setSuccess(false);
+                }
+
+            } else {
+                replyMessage.setMessage("User not valid");
+                replyMessage.setPayload(0L);
+                replyMessage.setSuccess(false);
+            }
+
+        } catch(Exception e) {
+            //Raise the exception to the caller to manage it
+            throw new Exception(e);
+        }
+        return replyMessage;
+        
+    } 
 
     /**
      * Private method to insert the user in the database, then build the ACK message

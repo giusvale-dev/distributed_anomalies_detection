@@ -44,7 +44,7 @@ public class LoginController {
      * @param password The password
      * @return the JWT Token if the user is authenticated
      */
-    @CrossOrigin
+    @CrossOrigin(origins = "*")
     @PostMapping("/api/login")
     public ResponseEntity<String> login(@RequestParam String username, @RequestParam String password) {
 
