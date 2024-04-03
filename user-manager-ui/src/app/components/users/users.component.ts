@@ -49,7 +49,7 @@ export class UsersComponent  {
     this.router.navigateByUrl(`${environment.editUserUrl}` + `/${id}`)
   }
 
-  confirm2(event: Event, id: string) {
+  cofirmDeleteDialog (event: Event, id: string) {
     this.confirmationService.confirm({
         target: event.target as EventTarget,
         message: 'Do you want to delete this record?',
@@ -61,13 +61,12 @@ export class UsersComponent  {
                 this.messageService.add({ severity: 'info', summary: 'Confirmed', detail: 'Record deleted', life: 3000 });
               },
               error: (err) => {
-                this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Could not process request, try again later', life: 3000 });
+                this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error: '  + err.message , life: 3000 });
               }
             })
             
         },
         reject: () => {
-            this.messageService.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
         }
     });
   }
