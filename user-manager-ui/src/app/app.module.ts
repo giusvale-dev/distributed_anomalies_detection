@@ -27,6 +27,8 @@ import { TableModule } from 'primeng/table';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { HeadingPageComponent } from './heading-page/heading-page.component';
 import { ToastModule } from 'primeng/toast';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
 
 
 
@@ -60,7 +62,9 @@ import { ToastModule } from 'primeng/toast';
     CheckboxModule,
     TableModule,
     ConfirmPopupModule,
-    ToastModule
+    ToastModule,
+    IconFieldModule,
+    InputIconModule
     
   ],
   providers: [

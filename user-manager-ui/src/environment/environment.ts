@@ -4,5 +4,5 @@ export const environment = {
     addUser: 'http://localhost:8081/api/user/insert',
     usersUrl: 'http://localhost:8081/api/user/view',
     editUserUrl: '',
-    deleteUser: ''
+    deleteUser: 'http://localhost:8081/api/user/delete'
   };

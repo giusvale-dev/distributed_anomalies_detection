@@ -1,23 +1,53 @@
 <app-menu-bar></app-menu-bar>
-<div class="pt-5 pb-5"></div>
-<p-card
-  title="users"
-  header="Users"
-  class="align-items-center justify-content-center text-center"
->
-  <div class="card">
+<div class="pt-5 pb-5" id="goUp"></div>
+
+<h2>Users</h2>
+<p-card>
+<div style="margin-bottom: 25px;">
+  <p-message *ngIf="message !== null" class="flex-1 flex align-items-center justify-content-center text-center" [severity]="severity" [text]="message"></p-message>
+</div>
+<div class="card">
+  
     <p-table
       [columns]="cols"
       [value]="users"
       styleClass="p-datatable-gridlines"
       [tableStyle]="{ 'min-width': '45rem' }"
+      [paginator]="true"
+      [rows]="10"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+      [rowsPerPageOptions]="[5, 10, 20]"
+      [globalFilterFields]="['id', 'name', 'surname', 'status']"
      
     >
       <ng-template pTemplate="header" let-columns>
         <tr>
-          <th *ngFor="let col of columns">
-            {{ col.header }}
+
+          <th pSortableColumn="{{col.header.toLowerCase()}}" *ngFor="let col of columns" [pSortableColumnDisabled]="col.header.toUpperCase() === 'ACTIONS'">
+            {{ col.header.toUpperCase() }}<p-sortIcon *ngIf="col.header.toUpperCase() !== 'ACTIONS'" field="{{ col.header.toLowerCase() }}"></p-sortIcon>
           </th>
+        </tr>
+        <tr>
+          <th>
+              <p-columnFilter type="text" field="id"></p-columnFilter>
+          </th>
+          <th>
+              <p-columnFilter type="text" field="name"></p-columnFilter>
+          </th>
+          <th>
+              <p-columnFilter type="text" field="surname"></p-columnFilter>
+          </th>
+          <th>
+              <p-columnFilter type="text" field="username"></p-columnFilter>
+          </th>
+          <th>
+            <p-columnFilter type="text" field="email"></p-columnFilter>
+          </th>
+          <th>
+            <p-columnFilter type="text" field="roles"></p-columnFilter>
+          </th>
+          <th></th>          
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-rowData let-columns="columns">
