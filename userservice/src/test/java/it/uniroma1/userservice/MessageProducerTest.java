@@ -80,7 +80,7 @@ public class MessageProducerTest {
 
         //Convert the response to a User
         ObjectMapper om = new ObjectMapper();
-        ACK<Long> ack = om.readValue(response, new TypeReference<ACK<Long>>() {});
+        ACK<Object> ack = om.readValue(response, new TypeReference<ACK<Object>>() {});
         
         assertNotNull(ack);
         assertEquals(ack.isSuccess(), true);

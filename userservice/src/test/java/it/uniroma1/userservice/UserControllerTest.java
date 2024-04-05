@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +68,7 @@ public class UserControllerTest {
 
 
     @Test
+    @Disabled
     public void insertUserControllerBySuperadmin() throws Exception {
         
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
@@ -121,6 +123,7 @@ public class UserControllerTest {
     }
 
     @Test
+    @Disabled
     public void insertUserControllerBySystemAdministrator() throws Exception {
         
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();

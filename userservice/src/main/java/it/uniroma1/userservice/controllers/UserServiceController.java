@@ -104,6 +104,44 @@ public class UserServiceController {
     }
 
     @CrossOrigin(origins = "*")
+    @PostMapping("/api/user/edit")
+    @PreAuthorize("hasRole('SUPERADMIN')")
+    public ResponseEntity<String> editUser(@Valid @RequestBody UserEditModel userModel) {
+        try {
+            logger.info("inserUser()");
+            User u = userModel.toUser();
+            MessagePayload mp = new MessagePayload(OperationType.UPDATE, u, null);
+            String response = messageProducer.sendMessage(mp);
+            if (response != null) {
+                //ACK RECEIVED
+                ObjectMapper om = new ObjectMapper();
+                ACK<Long> ack = om.readValue(response, new TypeReference<ACK<Long>>() {});
+                if (ack != null) {
+                    if (ack.isSuccess()) {
+                        if (ack.getPayload() != null) {
+                            om = new ObjectMapper();
+                            String bodyResponse = om.writeValueAsString(ack);
+                            return ResponseEntity.status(HttpStatus.OK).body(bodyResponse);    
+                        } else {
+                            return ResponseEntity.status(HttpStatus.OK).body("{ 'response' : 'OK'}");    
+                        } 
+                    } else {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ack.getMessage());
+                    }
+                } else {
+                    //ERROR
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Can't complete the operation");
+                }
+            } else {
+                //REQUEST NOT PERFORMED
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("At the moment is not possible satisfy the operation request");
+            }
+        } catch(Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @CrossOrigin(origins = "*")
     @PostMapping("/api/user/delete/{id}")
     @PreAuthorize("hasRole('SUPERADMIN')")
     public ResponseEntity<String> deleteUser(@PathVariable long id) {

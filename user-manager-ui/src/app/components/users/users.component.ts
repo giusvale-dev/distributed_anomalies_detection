@@ -60,7 +60,7 @@ export class UsersComponent  {
   }
 
   onClick(id : string){
-    this.router.navigateByUrl(`${environment.editUserUrl}` + `/${id}`)
+    this.router.navigateByUrl('users/edit/' + `${id}`);
   }
 
   cofirmDeleteDialog (event: Event, id: string) {
