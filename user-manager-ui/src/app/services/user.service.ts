@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { FormGroup } from '@angular/forms';
 import { environment } from '../../environment/environment';
+import { User } from '../Models/user.model';
 
 
 
@@ -11,8 +12,9 @@ import { environment } from '../../environment/environment';
   providedIn: 'root'
 })
 export class UserService {
-
-  constructor(private http: HttpClient) { }
+  public users: Array<User> ;
+  constructor(private http: HttpClient,
+              ) { }
 
   getUser(id: string): Observable<any>{
     return this.http.get(`${environment.usersUrl}`+ `/${ id }`)
@@ -22,20 +24,20 @@ export class UserService {
     return this.http.get(url).pipe(map(result => result));
   }
 
-  addUser(addUserForm: FormGroup): Observable<any>{
+  addUser(addUser: User): Observable<any>{
     const httpOptions = {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' })
     };
     const addUserUrl = environment.addUser;
-    return this.http.post(addUserUrl,addUserForm.value, httpOptions);
+    return this.http.post(addUserUrl,addUser, httpOptions);
   }
 
-  editUser(editUserForm: FormGroup, id: string): Observable<any>{
+  editUser(editUser: User, id: string): Observable<any>{
     const httpOptions = {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' })
     };
     const addUserUrl = environment.addUser;
-    return this.http.post(`${environment.editUserUrl}`+ `/${ id }`,editUserForm.value, httpOptions);
+    return this.http.post(`${environment.editUserUrl}`+ `/${ id }`,editUser, httpOptions);
   }
   
   deleteUser(id: string){
@@ -43,5 +45,12 @@ export class UserService {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' })
     };
     return this.http.post(`${environment.deleteUser}`+ `/${ id }`, httpOptions);
+  }
+
+  public getUsersList(): Array<User>  {
+    return this.users;
+  }
+  public setUsersList(users: any){
+    this.users = users;
   }
 }

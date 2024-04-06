@@ -85,6 +85,9 @@
         />
         <label for="confirmPassword">Confirm Password</label>
       </p-floatLabel>
+      <div class="field-message" *ngIf="addUserForm.controls['confirmPassword'].errors?.['confirmedValidator']">
+        <small id="confirmPassword-help" class="p-error">Passwords do not match.</small>
+      </div>
     </div>
     <div class="field py-2">
       <span
@@ -103,7 +106,7 @@
           <label for="float-label">Select Roles</label>
         </span>
       </div>
-      <p-message [hidden]="!showError" class="mt-2" severity="error" text="Passwords do not match"></p-message>
+      
       <div class="button py-5">
         <p-button
           label="Create User"

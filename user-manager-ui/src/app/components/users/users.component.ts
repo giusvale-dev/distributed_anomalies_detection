@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, Input } from '@angular/core';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { UserService } from '../../services/user.service';
+
 import { User } from '../../Models/user.model';
 import { environment } from '../../../environment/environment';
 import { Router } from '@angular/router';
@@ -28,7 +29,8 @@ export class UsersComponent  {
   private userService: UserService,
   private router: Router,
   private confirmationService: ConfirmationService,
-  private messageService: MessageService) {}
+  private messageService: MessageService,
+  ) {}
 
   ngOnInit(): void{
 
@@ -50,6 +52,7 @@ export class UsersComponent  {
     this.resp = this.userService.getUsers(`${environment.usersUrl}`).subscribe({
       next: (data: any) => {
         this.users = data
+        this.userService.setUsersList(this.users );
       }
     });
   }
