@@ -24,6 +24,7 @@ import java.util.Set;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import it.uniroma1.userservice.entities.Role;
 import it.uniroma1.userservice.entities.User;
@@ -35,6 +36,10 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class UserEditModel {
+    
+    @NotNull
+    @NotBlank
+    private long id;
     
     @Email
     @NotBlank
@@ -56,6 +61,7 @@ public class UserEditModel {
       public User toUser() {
 
         User u = new User();
+        u.setId(id);
         u.setEmail(email);
         u.setEnabled(enabled);
         u.setName(name);
