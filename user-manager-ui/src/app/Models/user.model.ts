@@ -8,6 +8,7 @@ export class User {
       public username: string,
       public email: string,
       public roles: [],
+      public enabled: boolean,
       private _token: string,
       public oldPassword?: string, //TODO: se questi campi non devono essere presenti nel modello di User allora nel component ti servono due proprietà per il binding
       public newPassword?: string  //TODO: se questi campi non devono essere presenti nel modello di User allora nel component ti servono due proprietà per il binding

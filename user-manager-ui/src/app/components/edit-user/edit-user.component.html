@@ -7,6 +7,9 @@
     class="flex-1 flex align-items-center justify-content-center text-center"
     [style]="{ width: '45rem' }"
   >
+  <div>
+    <p-message class="flex-1 flex align-items-center justify-content-center text-center" [hidden]="message==null" [severity]="severity" [text]="message"></p-message>
+  </div>
     <form
       [autocomplete]="false"
       [formGroup]="editUserForm"
@@ -81,6 +84,11 @@
           />
           <label for="confirmPassword">Confirm Password</label>
         </p-floatLabel>
+
+        <div class="field-message" *ngIf="editUserForm.controls['confirmPassword'].errors?.['confirmedValidator']">
+          <small id="confirmPassword-help" class="p-error">Passwords do not match.</small>
+        </div>
+        
       </div>
       <div class="field py-2">
         <span><label for="user-enabled">User enabled </label>
@@ -92,15 +100,14 @@
           <p-multiSelect
             inputId="float-label"
             [options]="roles"
-            formControlName="roles"
+            formControlName="sel_roles"
             optionLabel="value"
             placeholder="Select Roles"
           ></p-multiSelect>
           <label for="float-label">Select Roles</label>
         </span>
       </div>
-      <p-message [hidden]="!showError" class="mt-2" severity="error" text="Passwords do not match"></p-message>
-
+  
       <div class="button py-5">
         <p-button
           label="Edit User"

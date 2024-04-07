@@ -1,11 +1,13 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { environment } from '../../../environment/environment';
 import { HeadingPageComponent } from '../../heading-page/heading-page.component';
 import { Observable, catchError } from 'rxjs';
 import { UserService } from '../../services/user.service';
+import { User } from '../../Models/user.model';
+
 
 
 @Component({
@@ -26,27 +28,27 @@ export class AddUserComponent {
   }
 
   onAddUser() {
-      
-      if (this.addUserForm.get("confirmPassword").value === this.addUserForm.get("password").value) {
-        this.addUserForm.removeControl("confirmPassword");
+    let usrPayload: User;
+    usrPayload = new User('',this.addUserForm.get('name').value,this.addUserForm.get('surname').value,this.addUserForm.get('username').value,
+    this.addUserForm.get('email').value,this.addUserForm.get('authorities').value,this.addUserForm.get('enabled').value,this.addUserForm.get('password').value)
     
-        this.service.addUser(this.addUserForm).subscribe( { 
-          
-          next: (data: any) => {
-            console.log(data)
-            this.message = "User insert done"
-            this.severity = 'info';
-            
-          },
-          error: (err) => {
-            console.log(err);
-            this.message = err.error;
-            this.severity = 'error';
-          }})
-          this.router.navigateByUrl('/users/add')
-      } else {
-        this.showError = true;
-      }
+    
+
+    this.service.addUser(usrPayload).subscribe( { 
+      
+      next: (data: any) => {
+        console.log(data)
+        this.message = "User insert done"
+        this.severity = 'info';
+        
+      },
+      error: (err) => {
+        console.log(err);
+        this.message = err.error;
+        this.severity = 'error';
+      }})
+      this.router.navigateByUrl('/users/add')
+      
   }
 
 
@@ -67,7 +69,28 @@ export class AddUserComponent {
       confirmPassword: new FormControl("",Validators.required),
       authorities: new FormControl(""),
       enabled: new FormControl(true, Validators.required)
-    })
+    },
+    { validators: this.matchValidator('password','confirmPassword') })
+  }
+
+  matchValidator(controlName: string, matchingControlName: string): ValidatorFn {
+    return (abstractControl: AbstractControl) => {
+        const control = abstractControl.get(controlName);
+        const matchingControl = abstractControl.get(matchingControlName);
+
+        if (matchingControl!.errors && !matchingControl!.errors?.['confirmedValidator']) {
+            return null;
+        }
+
+        if (control!.value !== matchingControl!.value) {
+          const error = { confirmedValidator: 'Passwords do not match.' };
+          matchingControl!.setErrors(error);
+          return { passwordMismatch: true };
+        } else {
+          matchingControl!.setErrors(null);
+          return null;
+        }
+    }
   }
 
 }
