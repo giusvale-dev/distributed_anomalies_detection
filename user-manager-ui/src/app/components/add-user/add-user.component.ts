@@ -30,9 +30,10 @@ export class AddUserComponent {
   onAddUser() {
     let usrPayload: User;
     usrPayload = new User('',this.addUserForm.get('name').value,this.addUserForm.get('surname').value,this.addUserForm.get('username').value,
-    this.addUserForm.get('email').value,this.addUserForm.get('authorities').value,this.addUserForm.get('enabled').value,this.addUserForm.get('password').value)
+    this.addUserForm.get('email').value,this.addUserForm.get('authorities').value,this.addUserForm.get('enabled').value, '', this.addUserForm.get('password').value)
     
     
+    console.log(usrPayload)
 
     this.service.addUser(usrPayload).subscribe( { 
       

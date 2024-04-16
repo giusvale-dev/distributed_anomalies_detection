@@ -1,8 +1,9 @@
 import {Component, OnInit} from '@angular/core';
-import {AbstractControl, FormBuilder, FormGroup, ValidatorFn, Validators} from '@angular/forms';
+import {AbstractControl, FormArray, FormBuilder, FormGroup, ValidatorFn, Validators} from '@angular/forms';
 import { UserService } from '../../services/user.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { User } from '../../Models/user.model';
+import { UsersComponent } from '../users/users.component';
 
 
 interface Roles {
@@ -37,23 +38,24 @@ export class EditUserComponent implements OnInit {
   onEditUser(){
     let usrPayload: User;
     usrPayload = new User(this.user.id,this.editUserForm.get('name').value,this.editUserForm.get('surname').value,this.editUserForm.get('username').value,
-    this.editUserForm.get('email').value,this.editUserForm.get('sel_roles').value,this.editUserForm.get('enabled').value,this.editUserForm.get('oldPassword').value,
-    this.editUserForm.get('newPassword').value)
-    
+    this.editUserForm.get('email').value,this.editUserForm.get('sel_roles').value,this.editUserForm.get('enabled').value,'',this.editUserForm.get('newPassword').value)
+    console.log(usrPayload)
     this.service.editUser(usrPayload,this.user.id).subscribe( {
 
       next: (data: any) => {
         console.log(data)
         this.message = "User edit done"
         this.severity = 'info';
+        this.router.navigateByUrl('/users/'+ `${ this.user.id }`)
 
       },
       error: (err) => {
         console.log(err);
         this.message = err.error;
         this.severity = 'error';
+        this.router.navigateByUrl('/users/'+ `${ this.user.id }`)
       }})
-      this.router.navigateByUrl('/users/'+ `/${ this.user.id }`)
+      
 
   
 
@@ -66,6 +68,7 @@ export class EditUserComponent implements OnInit {
       this.setUser(this.us[parseInt(id)-1]);
       this.initForm(this.u)
     }else{
+      
       this.router.navigateByUrl('/users')
     }
   
@@ -98,7 +101,6 @@ export class EditUserComponent implements OnInit {
     this.u = data
   }
   private initForm(data: any) {
-    console.log(data)
     this.user = new User(data.id, data.name, data.surname, data.username, data.email, data.roles,data.enabled ,'')
     this.roles = [
       {label: "ScAdmin", value: "Security Administrator"},
@@ -110,15 +112,16 @@ export class EditUserComponent implements OnInit {
       surname: [this.user.surname],
       username: [{value: this.user.username, disabled: true}],
       email: [this.user.email],
-      oldPassword: [this.user.oldPassword, Validators.required],
-      newPassword: [this.user.newPassword, Validators.required],
+      newPassword: ['',Validators.required],
       confirmPassword: ['', Validators.required],
-      sel_roles: [this.user.roles],
+      sel_roles: new FormArray([]),
       enabled: [this.user.enabled]
     },
     {
       validators: this.matchValidator('newPassword','confirmPassword')
     });
+   
+    
   }
 
 
