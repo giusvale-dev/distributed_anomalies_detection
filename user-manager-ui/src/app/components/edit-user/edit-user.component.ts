@@ -46,14 +46,14 @@ export class EditUserComponent implements OnInit {
         console.log(data)
         this.message = "User edit done"
         this.severity = 'info';
-        this.router.navigateByUrl('/users/'+ `/${ this.user.id }`)
+        this.router.navigateByUrl('/users/'+ `${ this.user.id }`)
 
       },
       error: (err) => {
         console.log(err);
         this.message = err.error;
         this.severity = 'error';
-        this.router.navigateByUrl('/users/'+ `/${ this.user.id }`)
+        this.router.navigateByUrl('/users/'+ `${ this.user.id }`)
       }})
       
 
