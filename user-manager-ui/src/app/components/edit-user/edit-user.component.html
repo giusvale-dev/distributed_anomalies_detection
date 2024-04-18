@@ -7,9 +7,7 @@
     class="flex-1 flex align-items-center justify-content-center text-center"
     [style]="{ width: '45rem' }"
   >
-  <div>
-    <p-message class="flex-1 flex align-items-center justify-content-center text-center" [hidden]="message==null" [severity]="severity" [text]="message"></p-message>
-  </div>
+  
     <form
       [autocomplete]="false"
       [formGroup]="editUserForm"
@@ -55,17 +53,6 @@
       <div class="field py-2">
         <p-floatLabel>
           <input
-            id="oldPassword"
-            type="password"
-            pInputText
-            formControlName="oldPassword"
-          />
-          <label for="oldPassword">Old Password</label>
-        </p-floatLabel>
-      </div>
-      <div class="field py-2">
-        <p-floatLabel>
-          <input
             id="newPassword"
             type="password"
             pInputText
@@ -100,7 +87,7 @@
           <p-multiSelect
             inputId="float-label"
             [options]="roles"
-            formControlName="sel_roles"
+            formArrayName="sel_roles"
             optionLabel="value"
             placeholder="Select Roles"
           ></p-multiSelect>
