@@ -1,30 +1,25 @@
-package it.uniroma1;
+package  it.uniroma1.models;
+
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+
 
 public class Anomaly {
     private String datetime;
     private String details;
     private boolean fixed;
 
+
     public Anomaly(String datetime, String details) {
         this.datetime = datetime;
         this.details = details;
-        this.fixed = false;
-    }
 
-    public String getDatetime() {
-        return datetime;
-    }
-
-    public String getDetails() {
-        return details;
-    }
-
-    public boolean isFixed() {
-        return fixed;
-    }
-
-    public void setFixed(boolean fixed) {
-        this.fixed = fixed;
     }
 
     @Override
@@ -35,4 +30,8 @@ public class Anomaly {
                 ", fixed=" + fixed +
                 '}';
     }
+
+
+
+    
 }

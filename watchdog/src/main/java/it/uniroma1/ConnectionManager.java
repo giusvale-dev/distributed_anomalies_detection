@@ -5,18 +5,26 @@ import com.rabbitmq.client.ConnectionFactory;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
-public class ConnectionManager {
-    private static Connection connection = null;
 
-    public static Connection getConnection() {
-        if (connection == null) {
+public class ConnectionManager {
+
+    private ConnectionManager() {}
+
+    private static class ConnectionHolder {
+        private static final Connection INSTANCE = createConnection();
+
+        private static Connection createConnection() {
+            ConnectionFactory connectionFactory = new ConnectionFactory();
             try {
-                ConnectionFactory connectionFactory = new ConnectionFactory();
-                connection = connectionFactory.newConnection();
+                return connectionFactory.newConnection();
             } catch (IOException | TimeoutException e) {
-                e.printStackTrace();
+                throw new RuntimeException("Failed to create a connection", e);
             }
         }
-        return connection;
+    }
+
+    // Public method to get the instance of Connection
+    public static Connection getConnection() {
+        return ConnectionHolder.INSTANCE;
     }
 }

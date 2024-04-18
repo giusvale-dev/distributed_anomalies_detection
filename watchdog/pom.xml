@@ -13,10 +13,8 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <java.version>21</java.version>
-    <!--##############################-->
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
-    <!--##############################-->
+    <maven.compiler.source>21</maven.compiler.source>
+    <maven.compiler.target>21</maven.compiler.target>
   </properties>
 
   <dependencies>
@@ -31,7 +29,6 @@
       <artifactId>amqp-client</artifactId>
       <version>5.20.0</version>
     </dependency>
-    <!--########## Message ###############-->
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
@@ -40,12 +37,13 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>1.7.32</version> 
+      <version>1.7.36</version> 
     </dependency>
-
-    <!--########## Message ###############-->
-
-
+    <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <version>1.18.30</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -90,45 +88,6 @@
           <artifactId>maven-project-info-reports-plugin</artifactId>
           <version>3.0.0</version>
         </plugin>
-
-<!-- ######################################################################-->
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>exec-maven-plugin</artifactId>
-          <version>3.2.0</version>
-          <configuration>
-            <mainClass>it.uniroma1.app</mainClass>
-          </configuration>
-        </plugin>
-                      <!--for message -->
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.11.0</version> <!-- Update to a version that supports Java 22 -->
-          <configuration>
-            <source>22</source> <!-- Set source to Java 17 -->
-            <target>22</target> <!-- Set target to Java 17 -->
-            <compilerArgs>--enable-preview</compilerArgs>
-          </configuration>
-      </plugin>
-<!--done message plugin-->
-
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.0</version>
-                <!--
-                <configuration>
-                    <source>8</source>
-                    <target>8</target>
-                </configuration>  
-                
-                -->
-      </plugin>
-        
-        <!-- ################################################################ -->
-
-
       </plugins>
     </pluginManagement>
   </build>
