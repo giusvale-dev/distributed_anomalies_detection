@@ -3,6 +3,7 @@ package it.uniroma1;
 import java.io.BufferedReader;
 
 import java.io.InputStreamReader;
+import java.net.Inet4Address;
 
 import it.uniroma1.message.MessageProducer;
 
@@ -10,12 +11,11 @@ import it.uniroma1.message.MessageProducer;
 public class JournalctlReader implements Runnable {
 
     private String[] command;
+    private String ipAddress;
 
     public JournalctlReader(String... command) throws Exception {
-        // if(command == null || !(command.startsWith("journalctl") || command.startsWith("sudo journalctl")) ) {
-        //     throw new Exception("Invalid journalctl");
-        // }
         this.command = command;
+        this.ipAddress = Inet4Address.getLocalHost().getHostAddress();
     }
 
     @Override
@@ -32,7 +32,7 @@ public class JournalctlReader implements Runnable {
 
             String line;
             while ((line = br.readLine()) != null) {
-                mp.sendMessage(line);
+                mp.sendMessage(this.ipAddress + ":" + line);
             }
 
         } catch(Exception e) {

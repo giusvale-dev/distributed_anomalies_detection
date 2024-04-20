@@ -32,7 +32,7 @@ public class MessageProducer {
     private Connection connection = null;
     private Channel channel = null;
     private static final String EXCHANGE_NAME = "anomalies_exchange";
-    private static final String QUEUE_NAME = "anomalies_queue";
+    private static final String QUEUE_NAME = "anomaly_queue_instance_1";
     private static final String ROUTING_KEY = "anomalies_key";
 
 

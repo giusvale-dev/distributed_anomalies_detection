@@ -1,21 +1,13 @@
 package it.uniroma1.databaseservice.entities;
 
-import java.util.Set;
-
-
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import lombok.Getter;
@@ -42,6 +34,9 @@ public class Anomaly {
 
     @Column(nullable = false)
     private Boolean done;
+
+    @Column(name = "hash_code", nullable = false)
+    private String hashCode;
 
 
 }
