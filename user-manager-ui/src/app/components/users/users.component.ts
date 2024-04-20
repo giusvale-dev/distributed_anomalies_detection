@@ -33,7 +33,7 @@ export class UsersComponent  {
   ) {}
 
   ngOnInit(): void{
-
+   
     this.message = null;
     
     this.cols = [
@@ -42,7 +42,7 @@ export class UsersComponent  {
       { field: 'lastName', header: 'Surname'},
       { field: 'username', header: 'Username'},
       { field: 'email', header: 'Email'},
-      { field: 'roles', header: 'Roles'},
+      { field: 'authorities', header: 'Roles'},
       { field: 'actions', header: 'Actions'},
     ]
     this.loadData();

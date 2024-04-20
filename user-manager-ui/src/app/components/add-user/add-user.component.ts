@@ -41,14 +41,14 @@ export class AddUserComponent {
         console.log(data)
         this.message = "User insert done"
         this.severity = 'info';
-        
+        this.router.navigateByUrl('/users')
       },
       error: (err) => {
         console.log(err);
         this.message = err.error;
         this.severity = 'error';
       }})
-      this.router.navigateByUrl('/users/add')
+      
       
   }
 

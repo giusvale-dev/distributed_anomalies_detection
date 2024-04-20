@@ -124,7 +124,19 @@ public class MessageListener {
                 if (userToEdit != null) {
 
                     //Retrieve the editable information
-                    userToEdit.setAuthorities(m.getAuthorities());
+                    Set<Authority> roles = Collections.synchronizedSet(new HashSet<Authority>());
+                    if (m.getAuthorities() != null && !m.getAuthorities().isEmpty()) {
+                        for (Authority a : m.getAuthorities()) {
+                            if (a != null && a.getAuthorityName() != null) {
+                                a = authorityRepository
+                                        .findByAuthorityName(a.getAuthorityName().toUpperCase());
+                            }
+                            if (a != null) {
+                                roles.add(a);
+                            }
+                        }
+                    }
+                    userToEdit.setAuthorities(roles);
                     userToEdit.setEmail(m.getEmail());
                     userToEdit.setEnabled(m.getEnabled());
                     userToEdit.setName(m.getName());

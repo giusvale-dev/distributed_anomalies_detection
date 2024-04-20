@@ -7,7 +7,6 @@
     class="flex-1 flex align-items-center justify-content-center text-center"
     [style]="{ width: '45rem' }"
   >
-  
     <form
       [autocomplete]="false"
       [formGroup]="editUserForm"
@@ -86,9 +85,8 @@
         <span class="p-float-label">
           <p-multiSelect
             inputId="float-label"
-            [options]="roles"
-            formArrayName="sel_roles"
-            optionLabel="value"
+            [options]="roles"            
+            formControlName="sel_roles"
             placeholder="Select Roles"
           ></p-multiSelect>
           <label for="float-label">Select Roles</label>
