@@ -30,6 +30,7 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -64,7 +65,8 @@ public class DatabaseListenerTest {
     private AuthorityRepository authorityRepository;
 
     @Autowired
-    private DirectExchange directExchange;
+    @Qualifier("userExchange")
+    private DirectExchange userExchange;
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
@@ -90,7 +92,7 @@ public class DatabaseListenerTest {
         ObjectMapper om = new ObjectMapper();
         String jsonMessage = om.writeValueAsString(mp);
 
-        String response = (String) rabbitTemplate.convertSendAndReceive(directExchange.getName(), keyBinding,
+        String response = (String) rabbitTemplate.convertSendAndReceive(userExchange.getName(), keyBinding,
                 jsonMessage);
         assertNotNull(response);
 
@@ -137,7 +139,7 @@ public class DatabaseListenerTest {
         ObjectMapper om = new ObjectMapper();
         String jsonMessage = om.writeValueAsString(mp);
 
-        String response = (String) rabbitTemplate.convertSendAndReceive(directExchange.getName(), keyBinding,
+        String response = (String) rabbitTemplate.convertSendAndReceive(userExchange.getName(), keyBinding,
                 jsonMessage);
         assertNotNull(response);
 
@@ -173,7 +175,7 @@ public class DatabaseListenerTest {
         ObjectMapper om = new ObjectMapper();
         String jsonMessage = om.writeValueAsString(mp);
 
-        String response = (String) rabbitTemplate.convertSendAndReceive(directExchange.getName(), keyBinding,
+        String response = (String) rabbitTemplate.convertSendAndReceive(userExchange.getName(), keyBinding,
                 jsonMessage);
         assertNotNull(response);
 
@@ -194,7 +196,7 @@ public class DatabaseListenerTest {
         ObjectMapper om = new ObjectMapper();
         String jsonMessage = om.writeValueAsString(mp);
 
-        String response = (String) rabbitTemplate.convertSendAndReceive(directExchange.getName(), keyBinding,
+        String response = (String) rabbitTemplate.convertSendAndReceive(userExchange.getName(), keyBinding,
                 jsonMessage);
         assertNotNull(response);
 
@@ -235,7 +237,7 @@ public class DatabaseListenerTest {
         ObjectMapper om = new ObjectMapper();
         String jsonMessage = om.writeValueAsString(mp);
 
-        String response = (String) rabbitTemplate.convertSendAndReceive(directExchange.getName(), keyBinding,
+        String response = (String) rabbitTemplate.convertSendAndReceive(userExchange.getName(), keyBinding,
                 jsonMessage);
         assertNotNull(response);
 
@@ -286,7 +288,7 @@ public class DatabaseListenerTest {
         ObjectMapper om = new ObjectMapper();
         String jsonMessage = om.writeValueAsString(mp);
 
-        String response = (String) rabbitTemplate.convertSendAndReceive(directExchange.getName(), keyBinding, jsonMessage);
+        String response = (String) rabbitTemplate.convertSendAndReceive(userExchange.getName(), keyBinding, jsonMessage);
         assertNotNull(response);
 
         ACK<Long> ack = om.readValue(response, new TypeReference<ACK<Long>>() {});

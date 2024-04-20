@@ -54,24 +54,24 @@ public class RabbitMqListenerConfig {
         return new Queue(queueAnomalyName, false);
     }
 
-    @Bean
+    @Bean(name = "userExchange")
     public DirectExchange exchange() {
         return new DirectExchange("user_exchange");
     }
 
-    @Bean
+    @Bean(name = "anomalyExchange")
     public DirectExchange anomalyExchange() {
         return new DirectExchange("anomalies_exchange");
     }
 
     @Bean
-    Binding bindingA(Queue queue, DirectExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with(keyBindingAnomaly);
+    Binding bindingA() {
+        return BindingBuilder.bind(queue()).to(exchange()).with(keyBindingAnomaly);
     }
 
     @Bean
-    Binding bindingB(Queue anomalyQueue, DirectExchange anomalyExchange) {
-        return BindingBuilder.bind(anomalyQueue).to(anomalyExchange).with(keyBinding);
+    Binding bindingB() {
+        return BindingBuilder.bind(anomalyQueue()).to(anomalyExchange()).with(keyBinding);
     }
 
     
