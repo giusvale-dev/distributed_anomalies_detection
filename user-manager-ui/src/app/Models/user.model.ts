@@ -7,7 +7,7 @@ export class User {
       public surname: string,
       public username: string,
       public email: string,
-      public roles: [],
+      public authorities: [],
       public enabled: boolean,
       private _token: string,
       public password?: string, 

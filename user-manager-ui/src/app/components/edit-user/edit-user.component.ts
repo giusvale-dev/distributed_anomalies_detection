@@ -6,10 +6,7 @@ import { User } from '../../Models/user.model';
 import { UsersComponent } from '../users/users.component';
 
 
-interface Roles {
-  label: string;
-  value: string;
-}
+
 
 @Component({
   selector: 'app-edit-user',
@@ -20,7 +17,7 @@ interface Roles {
 
 export class EditUserComponent implements OnInit {
   editUserForm!: FormGroup;
-  roles!: Roles[] ;
+  roles!: string[];
   id:String;
   data: any;
   user: User;
@@ -35,32 +32,33 @@ export class EditUserComponent implements OnInit {
     private route: ActivatedRoute ,
     private router: Router,
     private fb: FormBuilder) {}
+    
   onEditUser(){
     let usrPayload: User;
     usrPayload = new User(this.user.id,this.editUserForm.get('name').value,this.editUserForm.get('surname').value,this.editUserForm.get('username').value,
     this.editUserForm.get('email').value,this.editUserForm.get('sel_roles').value,this.editUserForm.get('enabled').value,'',this.editUserForm.get('newPassword').value)
-    console.log(usrPayload)
     this.service.editUser(usrPayload,this.user.id).subscribe( {
 
       next: (data: any) => {
         console.log(data)
         this.message = "User edit done"
         this.severity = 'info';
-        this.router.navigateByUrl('/users/'+ `${ this.user.id }`)
+        this.router.navigateByUrl('/users')
 
       },
       error: (err) => {
         console.log(err);
         this.message = err.error;
         this.severity = 'error';
-        this.router.navigateByUrl('/users/'+ `${ this.user.id }`)
+        this.router.navigateByUrl('/users/edit'+ `/${ this.user.id }`)
       }})
-      
-
-  
-
   }
+
   ngOnInit() {
+    this.roles = [
+      "ROLE_SUPERADMIN",
+      "ROLE_SYSTEM_ADMINISTRATOR",
+    ];
     
     let id: string = this.route.snapshot.paramMap.get('id')
     this.setUserList(this.service.getUsersList())
@@ -102,27 +100,23 @@ export class EditUserComponent implements OnInit {
   }
   private initForm(data: any) {
     this.user = new User(data.id, data.name, data.surname, data.username, data.email, data.roles,data.enabled ,'')
-    this.roles = [
-      {label: "ScAdmin", value: "Security Administrator"},
-      {label: "User", value: "User"},
-    ];
+    
     
     this.editUserForm = this.fb.group({
       name: [this.user.name],
       surname: [this.user.surname],
       username: [{value: this.user.username, disabled: true}],
       email: [this.user.email],
-      newPassword: ['',Validators.required],
-      confirmPassword: ['', Validators.required],
-      sel_roles: new FormArray([]),
+      newPassword: [''],
+      confirmPassword: [''],
+      sel_roles: [this.user.authorities],
       enabled: [this.user.enabled]
     },
     {
       validators: this.matchValidator('newPassword','confirmPassword')
     });
-   
+    
     
   }
-
 
 }
