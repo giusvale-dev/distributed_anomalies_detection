@@ -43,10 +43,17 @@ public class MessageProducer {
     private DirectExchange userExchange;
 
     @Autowired
+    @Qualifier("anomalyExchange")
+    private DirectExchange anomalyExchange;
+
+    @Autowired
     private RabbitTemplate rabbitTemplate;
 
     @Value("${binding.rabbitmq.key}")
     private String keyBinding;
+
+    @Value("${binding.rabbitmq.anomaly.key}")
+    private String keyBindingAnomaly;
 
     public String sendMessage(MessagePayload payload) throws InvalidInputParameter, JsonProcessingException {
         
@@ -57,6 +64,17 @@ public class MessageProducer {
             String response = (String) rabbitTemplate.convertSendAndReceive(userExchange.getName(), keyBinding, jsonMessage);
             return response;
             
+        }
+        return null;
+    }
+
+    public String sendAnomalyMessage(AnomalyMessagePayload payload) throws JsonProcessingException  {
+
+        if(payload != null) {     
+            ObjectMapper om = new ObjectMapper();
+            String jsonMessage = om.writeValueAsString(payload);
+            String response = (String) rabbitTemplate.convertSendAndReceive(anomalyExchange.getName(), keyBindingAnomaly, jsonMessage);
+            return response;
         }
         return null;
     }

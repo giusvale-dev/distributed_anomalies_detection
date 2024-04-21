@@ -19,11 +19,12 @@
 package it.uniroma1.databaseservice.messaging;
 
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
+import java.util.List;
 
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -41,8 +42,11 @@ public class AnomalyListener {
     
     
     @RabbitListener(queues = { "${queue.rabbitmq.listener.anomaly}" })
-    public void receiveMessage(String message) throws Exception {
+    @SendTo("anomalies_exchange/${binding.rabbitmq.anomaly.key}")
+    public String receiveMessage(String message) throws Exception {
 
+        ACK<Object> replyMessage = new ACK<Object>();
+        String response = "";
         try {
             ObjectMapper om = new ObjectMapper();
             GenericMessagePayload mp = (GenericMessagePayload) om.readValue(message, GenericMessagePayload.class);
@@ -50,48 +54,90 @@ public class AnomalyListener {
             if(mp != null) {
                 switch (mp.getOperationType()) {
                     case INSERT:
-                        insertAnomaly(mp.getData());
+                        replyMessage = insertAnomaly(mp.getData());
                         break;
                     case SEARCH:
+                        replyMessage = loadUnresolvedAnomalies();
                         break;
                     default:
                         break;
                 }
             }
 
-        } catch(Exception e) {
-            e.printStackTrace();
-            return; //To avoid the insertion of the same message in the queue
+        } catch (Exception e) {
+            replyMessage.setMessage(e.getMessage());
+            replyMessage.setPayload(0L);
+            replyMessage.setSuccess(false);
+        } finally {
+            ObjectMapper om = new ObjectMapper();
+            response = om.writeValueAsString(replyMessage);
         }
+
+        // Send back the ACK
+        return response;
     }
 
     /**
      * Insert new anomaly in the system. If the hashCode already exist means that the anomaly already exist in the database
      * @param message
-     * @throws NoSuchAlgorithmException
+     * @throws Exception 
      */
-    private void insertAnomaly(AnomalyModel message) throws NoSuchAlgorithmException {
-        if(message != null) {
+    private ACK<Object> insertAnomaly(AnomalyModel message) throws Exception {
 
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            
-            //Hashing the anomaly details
-            String hashCode = new String(md.digest(message.getDetails().getBytes()));
-            
-            if(anomalyRepository.findByHashCode(hashCode) == null) {
-
-                Anomaly anomaly = new Anomaly();
-                anomaly.setDate(message.getDatetime());
-                anomaly.setDescription(message.getDetails());
-                anomaly.setDone(false);
-                anomaly.setHashCode(hashCode);
-                anomaly.setHostname(message.getHostname());
-                anomaly.setIpAddress(message.getIpAddress());
-                anomalyRepository.save(anomaly);
-
+        ACK<Object> replyMessage = new ACK<Object>();
+        try {
+            if(message != null) {
+    
+                MessageDigest md = MessageDigest.getInstance("SHA-256");
+                
+                //Hashing the anomaly details
+                String hashCode = new String(md.digest(message.getDetails().getBytes()));
+                String hashCodeBase64 = new String(Base64.getEncoder().encode(hashCode.getBytes()));
+                
+                if(anomalyRepository.findByHashCode(hashCode) == null) {
+    
+                    Anomaly anomaly = new Anomaly();
+                    anomaly.setDate(message.getDatetime());
+                    anomaly.setDescription(message.getDetails());
+                    anomaly.setDone(false);
+                    anomaly.setHashCode(hashCodeBase64);
+                    anomaly.setHostname(message.getHostname());
+                    anomaly.setIpAddress(message.getIpAddress());
+                    Anomaly persistent = anomalyRepository.save(anomaly);
+                    replyMessage.setMessage("Ok");
+                    replyMessage.setPayload(persistent.getId());
+                    replyMessage.setSuccess(true);
+    
+                } else {
+                    replyMessage.setMessage(hashCode + " is already present");
+                    replyMessage.setPayload(0L);
+                    replyMessage.setSuccess(false);
+                }
             } else {
-                throw new DuplicateKeyException(hashCode + " is already present");
+                
+                replyMessage.setMessage("Input not valid");
+                replyMessage.setSuccess(false);
             }
+        } catch(Exception e) {
+            throw new Exception(e);
         }
-    }     
+        return replyMessage;
+    }
+
+    private ACK<Object> loadUnresolvedAnomalies() throws Exception {
+
+        ACK<Object> replyMessage = new ACK<Object>();
+        try {
+            List<Anomaly> lst = anomalyRepository.loadAllUnresolvedAnomalies();
+            replyMessage.setMessage("Ok");
+            replyMessage.setSuccess(true);
+            replyMessage.setPayload(lst);
+
+        } catch(Exception e) {
+            throw new Exception(e);
+        }
+        return replyMessage;
+
+    }
+    
 }

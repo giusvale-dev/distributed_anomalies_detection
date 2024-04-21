@@ -20,10 +20,12 @@
 package it.uniroma1.databaseservice;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -40,10 +42,13 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import it.uniroma1.databaseservice.entities.Anomaly;
 import it.uniroma1.databaseservice.entities.Authority;
 import it.uniroma1.databaseservice.entities.Member;
+import it.uniroma1.databaseservice.entities.models.AnomalyModel;
 import it.uniroma1.databaseservice.entities.models.UserUI;
 import it.uniroma1.databaseservice.messaging.ACK;
+import it.uniroma1.databaseservice.messaging.GenericMessagePayload;
 import it.uniroma1.databaseservice.messaging.MessagePayload;
 import it.uniroma1.databaseservice.messaging.OperationType;
 import it.uniroma1.databaseservice.repositories.AuthorityRepository;
@@ -69,10 +74,17 @@ public class DatabaseListenerTest {
     private DirectExchange userExchange;
 
     @Autowired
+    @Qualifier("anomalyExchange")
+    private DirectExchange anomalyExchange;
+
+    @Autowired
     private RabbitTemplate rabbitTemplate;
 
     @Value("${binding.rabbitmq.key}")
     private String keyBinding;
+
+    @Value("${binding.rabbitmq.anomaly.key}")
+    private String keyBindingAnomaly;
 
     @Test
     public void testUserInsertWithoutRoles() throws JsonProcessingException {
@@ -308,6 +320,84 @@ public class DatabaseListenerTest {
         assertTrue(editedUser.getAuthorities() == null || editedUser.getAuthorities().size() == 0);
         assertTrue(bCryptPasswordEncoder.matches("edited_password", editedUser.getPassword()));
     
+    }
+
+    @Test
+    public void test_anomaly_insert() throws JsonProcessingException {
+
+        GenericMessagePayload mp = new GenericMessagePayload();
+        mp.setOperationType(OperationType.INSERT);
+
+        AnomalyModel model = new AnomalyModel();
+        model.setDatetime(new Date());
+        String detail = "apr 21 18:33:51 archlinux-vm sudo[4703]: pam_unix(sudo:session): session opened for user root(uid=0) by giusvale(uid=1000)";
+        model.setDetails(detail);
+        model.setHostname("hostname");
+        model.setIpAddress("10.0.0.3");
+
+        mp.setData(model);
+
+        ObjectMapper om = new ObjectMapper();
+        String jsonMessage = om.writeValueAsString(mp);
+
+        String response = (String) rabbitTemplate.convertSendAndReceive(anomalyExchange.getName(), keyBindingAnomaly, jsonMessage);
+        assertNotNull(response);
+
+        ACK<Long> ack = om.readValue(response, new TypeReference<ACK<Long>>() {});
+        assertNotNull(ack);
+        assertEquals(true, ack.isSuccess());
+        assertNotEquals(0, ack.getPayload());
+
+    }
+
+    @Test
+    public void test_anomaly_read() throws JsonProcessingException {
+
+        GenericMessagePayload mp = new GenericMessagePayload();
+        String detail = "apr 21 18:33:51 archlinux-vm sudo[4703]: pam_unix(sudo:session): session opened for user root(uid=0) by giusvale(uid=1000)";
+        
+        for(int i = 0; i < 100; i++) {
+
+            mp.setOperationType(OperationType.INSERT);
+            AnomalyModel model = new AnomalyModel();
+            model.setDatetime(new Date());
+            model.setDetails(i + " " + detail);
+            model.setHostname("hostname");
+            model.setIpAddress("10.0.0.3");
+            mp.setData(model);
+            ObjectMapper om = new ObjectMapper();
+            String jsonMessage = om.writeValueAsString(mp);
+
+            String response = (String) rabbitTemplate.convertSendAndReceive(anomalyExchange.getName(), keyBindingAnomaly, jsonMessage);
+            assertNotNull(response);
+
+            ACK<Long> ack = om.readValue(response, new TypeReference<ACK<Long>>() {});
+            assertNotNull(ack);
+            assertEquals(true, ack.isSuccess());
+            assertNotEquals(0, ack.getPayload());
+
+        }
+
+        mp = new GenericMessagePayload();
+        mp.setOperationType(OperationType.SEARCH);
+        ObjectMapper om = new ObjectMapper();
+        String jsonMessage = om.writeValueAsString(mp);
+
+        String response = (String) rabbitTemplate.convertSendAndReceive(anomalyExchange.getName(), keyBindingAnomaly, jsonMessage);
+        assertNotNull(response);
+
+        ACK<List<Anomaly>> ack = om.readValue(response, new TypeReference<ACK<List<Anomaly>>>() {});
+        assertNotNull(ack);
+        assertEquals(true, ack.isSuccess());
+        List<Anomaly> lst = ack.getPayload();
+        assertNotNull(lst);
+        lst.forEach((anomaly) -> {
+            assertNotNull(anomaly);
+            assertEquals("hostname", anomaly.getHostname());
+            assertEquals("10.0.0.3", anomaly.getIpAddress());
+            assertTrue(anomaly.getDescription().contains(detail));
+        });
+        
     }
 
 

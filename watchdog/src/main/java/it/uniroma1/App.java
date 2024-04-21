@@ -12,13 +12,8 @@ public class App
         JournalctlReader j2 = new JournalctlReader(arg);
         Thread t2 = new Thread(j2);
         t2.start();
+
+        
     }
-    
-    /**
-     * Insert the listener to detect the anomaly
-     * Convert the string anomaly in a obkect format
-     * Insert the entry in the database
-     * 
-     */
 
 }

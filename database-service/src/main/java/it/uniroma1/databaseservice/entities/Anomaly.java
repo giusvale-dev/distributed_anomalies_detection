@@ -21,8 +21,11 @@ package it.uniroma1.databaseservice.entities;
 
 import java.util.Date;
 
+import org.hibernate.type.NumericBooleanConverter;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -52,6 +55,7 @@ public class Anomaly {
     private String description;
 
     @Column(nullable = false)
+    @Convert(converter = NumericBooleanConverter.class)
     private Boolean done;
 
     @Column(nullable = false)
