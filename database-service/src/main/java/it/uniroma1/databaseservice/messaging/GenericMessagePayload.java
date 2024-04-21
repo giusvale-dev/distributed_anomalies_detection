@@ -17,51 +17,20 @@
  *SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package it.uniroma1.databaseservice.entities;
+package it.uniroma1.databaseservice.messaging;
 
-import java.util.Date;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
+import it.uniroma1.databaseservice.entities.models.AnomalyModel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@AllArgsConstructor
 @NoArgsConstructor
-@Entity
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class Anomaly {
+public class GenericMessagePayload {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date date;
-
-    @Column(length = 1500)
-    private String description;
-
-    @Column(nullable = false)
-    private Boolean done;
-
-    @Column(nullable = false)
-    private String hostname;
-
-    @Column(name = "ip_address", nullable = false)
-    private String ipAddress;
-    
-    @Column(name = "hash_code", nullable = false)
-    private String hashCode;
-
-
+    private OperationType operationType;
+    private AnomalyModel data;
 }

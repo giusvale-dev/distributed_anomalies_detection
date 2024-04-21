@@ -16,19 +16,12 @@
  *OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  *SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-
-package it.uniroma1.databaseservice.entities;
+package it.uniroma1.databaseservice.entities.models;
 
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -36,32 +29,12 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Anomaly {
+public class AnomalyModel {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date date;
-
-    @Column(length = 1500)
-    private String description;
-
-    @Column(nullable = false)
-    private Boolean done;
-
-    @Column(nullable = false)
     private String hostname;
-
-    @Column(name = "ip_address", nullable = false)
     private String ipAddress;
+    private Date datetime;
+    private String details;
     
-    @Column(name = "hash_code", nullable = false)
-    private String hashCode;
-
-
 }

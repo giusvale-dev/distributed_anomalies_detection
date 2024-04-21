@@ -26,5 +26,7 @@ CREATE TABLE IF NOT EXISTS anomaly (
   date TIMESTAMP DEFAULT NOW(),
   description VARCHAR(1500),
   hash_code VARCHAR(256),
-  done TINYINT DEFAULT '0'
-)
+  ip_address VARCHAR(256),
+  hostname VARCHAR(256),
+  done TINYINT DEFAULT 0
+);

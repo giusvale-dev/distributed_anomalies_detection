@@ -17,23 +17,9 @@
  *SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package  it.uniroma1.models;
+package it.uniroma1.message;
 
-
-import java.util.Date;
-
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-@Getter
-@Setter
-@NoArgsConstructor
-public class Anomaly {
-
-    private String hostname;
-    private String ipAddress;
-    private Date datetime;
-    private String details;
-    
+public enum OperationType {
+    INSERT,
+    SEARCH
 }
