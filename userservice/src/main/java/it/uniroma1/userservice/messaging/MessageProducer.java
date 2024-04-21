@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -38,10 +39,11 @@ public class MessageProducer {
     Logger logger = LoggerFactory.getLogger(MessageProducer.class);
 
     @Autowired
-    private RabbitTemplate rabbitTemplate;
+    @Qualifier("userExchange")
+    private DirectExchange userExchange;
 
     @Autowired
-    private DirectExchange directExchange;
+    private RabbitTemplate rabbitTemplate;
 
     @Value("${binding.rabbitmq.key}")
     private String keyBinding;
@@ -52,7 +54,7 @@ public class MessageProducer {
             
             ObjectMapper om = new ObjectMapper();
             String jsonMessage = om.writeValueAsString(payload);
-            String response = (String) rabbitTemplate.convertSendAndReceive(directExchange.getName(), keyBinding, jsonMessage);
+            String response = (String) rabbitTemplate.convertSendAndReceive(userExchange.getName(), keyBinding, jsonMessage);
             return response;
             
         }

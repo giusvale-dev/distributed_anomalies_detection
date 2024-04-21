@@ -37,8 +37,14 @@ public class RabbitMqConfig {
     @Value("${queue.rabbitmq.listener.name}")
     private String queueName;
 
+    @Value("${queue.rabbitmq.listener.anomaly}")
+    private String queueAnomalyName;
+
     @Value("${binding.rabbitmq.key}")
     private String keyBinding;
+
+    @Value("${binding.rabbitmq.anomaly.key}")
+    private String keyBindingAnomaly;
 
     @Bean
     public Queue queue() {
@@ -46,13 +52,28 @@ public class RabbitMqConfig {
     }
 
     @Bean
-    public DirectExchange exchange() {
+    public Queue anomalyQueue() {
+        return new Queue(queueAnomalyName, false);
+    }
+
+    @Bean(name = "userExchange")
+    public DirectExchange userExchange() {
         return new DirectExchange("user_exchange");
     }
 
+    @Bean(name = "anomalyExchange")
+    public DirectExchange anomalyExchange() {
+        return new DirectExchange("anomalies_exchange");
+    }
+
     @Bean
-    Binding bindingA(Queue queue, DirectExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with(keyBinding);
+    Binding bindingA() {
+        return BindingBuilder.bind(queue()).to(userExchange()).with(keyBindingAnomaly);
+    }
+
+    @Bean
+    Binding bindingB() {
+        return BindingBuilder.bind(anomalyQueue()).to(anomalyExchange()).with(keyBinding);
     }
 
 }
