@@ -51,6 +51,7 @@ import it.uniroma1.databaseservice.messaging.ACK;
 import it.uniroma1.databaseservice.messaging.GenericMessagePayload;
 import it.uniroma1.databaseservice.messaging.MessagePayload;
 import it.uniroma1.databaseservice.messaging.OperationType;
+import it.uniroma1.databaseservice.repositories.AnomalyRepository;
 import it.uniroma1.databaseservice.repositories.AuthorityRepository;
 import it.uniroma1.databaseservice.repositories.MemberRepository;
 import jakarta.transaction.Transactional;
@@ -68,6 +69,9 @@ public class DatabaseListenerTest {
 
     @Autowired
     private AuthorityRepository authorityRepository;
+
+    @Autowired
+    private AnomalyRepository anomalyRepository;
 
     @Autowired
     @Qualifier("userExchange")
@@ -398,6 +402,69 @@ public class DatabaseListenerTest {
             assertTrue(anomaly.getDescription().contains(detail));
         });
         
+    }
+
+    @Test
+    public void test_anomaly_reset_to_green() throws JsonProcessingException {
+
+        GenericMessagePayload mp = new GenericMessagePayload();
+        String detail = "apr 21 18:33:51 archlinux-vm sudo[4703]: pam_unix(sudo:session): session opened for user root(uid=0) by giusvale(uid=1000)";
+        
+        List<Long> insertedAnomaliesId = new ArrayList<Long>();
+
+        //insert anomalies
+        for(int i = 0; i < 100; i++) {
+
+            mp.setOperationType(OperationType.INSERT);
+            AnomalyModel model = new AnomalyModel();
+            model.setDatetime(new Date());
+            model.setDetails(new Date().toString() + " " + detail);
+            model.setHostname("hostname");
+            model.setIpAddress("10.0.0.3");
+            mp.setData(model);
+            ObjectMapper om = new ObjectMapper();
+            String jsonMessage = om.writeValueAsString(mp);
+
+            String response = (String) rabbitTemplate.convertSendAndReceive(anomalyExchange.getName(), keyBindingAnomaly, jsonMessage);
+            assertNotNull(response);
+
+            ACK<Long> ack = om.readValue(response, new TypeReference<ACK<Long>>() {});
+            assertNotNull(ack);
+            assertEquals(true, ack.isSuccess());
+            assertNotEquals(0, ack.getPayload());
+            insertedAnomaliesId.add(ack.getPayload());
+
+        }
+
+        //reset to green the anomalies
+        for(long id : insertedAnomaliesId) {
+
+            mp = new GenericMessagePayload();
+            mp.setOperationType(OperationType.UPDATE);
+            
+            AnomalyModel am = new AnomalyModel();
+            am.setId(id);
+
+            mp.setData(am);
+
+            ObjectMapper om = new ObjectMapper();
+            String jsonMessage = om.writeValueAsString(mp);
+            String response = (String) rabbitTemplate.convertSendAndReceive(anomalyExchange.getName(), keyBindingAnomaly, jsonMessage);
+            assertNotNull(response);
+    
+            ACK<Long> ack = om.readValue(response, new TypeReference<ACK<Long>>() {});
+            assertNotNull(ack);
+            assertEquals(true, ack.isSuccess());
+        }
+
+        //check if the anomalies are toggled to true in the done field
+        for(long id : insertedAnomaliesId) {
+            Anomaly a = anomalyRepository.findById(id).orElse(null);
+            assertNotNull(a);
+            assertEquals(true, a.getDone());
+        }
+
+    
     }
 
 

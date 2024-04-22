@@ -28,12 +28,15 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import it.uniroma1.userservice.entities.ACK;
+import it.uniroma1.userservice.entities.AnomalyModel;
 import it.uniroma1.userservice.entities.OperationType;
 import it.uniroma1.userservice.messaging.AnomalyMessagePayload;
 import it.uniroma1.userservice.messaging.MessageProducer;
@@ -78,6 +81,41 @@ public class AnomalyController {
             }
 
         } catch(Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @CrossOrigin(origins = "*")
+    @PostMapping("/api/anomaly/fix")
+    @PreAuthorize("hasRole('SYSTEM_ADMINISTRATOR')")
+    public ResponseEntity<String> resetToGreen(@PathVariable long id) {
+        try {
+            logger.info("resetToGreen()");
+            AnomalyMessagePayload mp = new AnomalyMessagePayload();
+            mp.setOperationType(OperationType.UPDATE);
+            AnomalyModel model = new AnomalyModel();
+            model.setId(id);
+            String response = messageProducer.sendAnomalyMessage(mp);
+            if(response != null) {
+                ObjectMapper om = new ObjectMapper();
+                ACK<Object> ack = om.readValue(response, new TypeReference<ACK<Object>>() {});
+                if (ack != null) {
+                    if (ack.isSuccess()) {
+                        return ResponseEntity.status(HttpStatus.OK).body("{ 'response' : 'OK'}");    
+                    } else {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ack.getMessage());
+                    }
+                } else {
+                    //ERROR
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Can't complete the operation");
+                }
+
+            } else {
+                //REQUEST NOT PERFORMED
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("At the moment is not possible satisfy the operation request");
+            }
+           
+        } catch(Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }

@@ -32,6 +32,7 @@ import lombok.Setter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AnomalyModel {
 
+    private long id;
     private String hostname;
     private String ipAddress;
     private Date datetime;

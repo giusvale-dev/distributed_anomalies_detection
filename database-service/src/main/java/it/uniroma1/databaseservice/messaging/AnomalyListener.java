@@ -59,6 +59,9 @@ public class AnomalyListener {
                     case SEARCH:
                         replyMessage = loadUnresolvedAnomalies();
                         break;
+                    case UPDATE:
+                        replyMessage = resetToGreen(mp.getData());
+                        break;
                     default:
                         break;
                 }
@@ -75,6 +78,40 @@ public class AnomalyListener {
 
         // Send back the ACK
         return response;
+    }
+
+    private ACK<Object> resetToGreen(AnomalyModel message) throws Exception {
+
+        ACK<Object> replyMessage = new ACK<Object>();
+
+        try {
+            if(message != null) {
+    
+                Anomaly anomaly = anomalyRepository.findById(message.getId()).orElse(null);
+                if(anomaly != null) {
+
+                    anomaly.setDone(true); //Toggle to true
+                    anomalyRepository.save(anomaly);
+                    replyMessage.setMessage("Ok");
+                    replyMessage.setPayload(anomaly.getId());
+                    replyMessage.setSuccess(true);
+
+                } else {
+                    replyMessage.setMessage("Anomaly is not present");
+                    replyMessage.setPayload(message.getId());
+                    replyMessage.setSuccess(false);
+                }
+
+            } else {
+                
+                replyMessage.setMessage("Input not valid");
+                replyMessage.setSuccess(false);
+            }
+        } catch(Exception e) {
+            throw new Exception(e);
+        }
+        return replyMessage;
+        
     }
 
     /**

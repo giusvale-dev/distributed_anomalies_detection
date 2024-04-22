@@ -18,6 +18,15 @@
  */
 package it.uniroma1.userservice.entities;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
 public class AnomalyModel {
+
+    private long id;
     
 }
