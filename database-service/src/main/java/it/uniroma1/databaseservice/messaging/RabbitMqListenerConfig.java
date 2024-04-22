@@ -66,12 +66,12 @@ public class RabbitMqListenerConfig {
 
     @Bean
     Binding bindingA() {
-        return BindingBuilder.bind(queue()).to(exchange()).with(keyBindingAnomaly);
+        return BindingBuilder.bind(queue()).to(exchange()).with(keyBinding);
     }
 
     @Bean
     Binding bindingB() {
-        return BindingBuilder.bind(anomalyQueue()).to(anomalyExchange()).with(keyBinding);
+        return BindingBuilder.bind(anomalyQueue()).to(anomalyExchange()).with(keyBindingAnomaly);
     }
 
     
