@@ -32,5 +32,5 @@ import lombok.Setter;
 public class AnomalyMessagePayload {
     
     private OperationType operationType;
-    private AnomalyModel anomaly;
+    private AnomalyModel data;
 }

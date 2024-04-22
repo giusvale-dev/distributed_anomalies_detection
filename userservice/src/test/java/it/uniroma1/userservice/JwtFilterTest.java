@@ -129,7 +129,6 @@ public class JwtFilterTest {
     }
 
 
-    @SuppressWarnings("null")
     private  ResponseEntity<String> sendGetHttpRequest(String token) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

@@ -269,7 +269,6 @@ public class MessageListener {
             }
 
             //Adding roles name to the response
-            //TODO: This query should be optimized, now is very slow
             if (searchResult != null) {
                 searchResult.forEach(userUI -> {
                     if(userUI != null) {
