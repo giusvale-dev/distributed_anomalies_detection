@@ -86,7 +86,7 @@ public class AnomalyController {
     }
 
     @CrossOrigin(origins = "*")
-    @PostMapping("/api/anomaly/fix")
+    @PostMapping("/api/anomaly/fix/{id}")
     @PreAuthorize("hasRole('SYSTEM_ADMINISTRATOR')")
     public ResponseEntity<String> resetToGreen(@PathVariable long id) {
         try {
@@ -95,6 +95,7 @@ public class AnomalyController {
             mp.setOperationType(OperationType.UPDATE);
             AnomalyModel model = new AnomalyModel();
             model.setId(id);
+            mp.setData(model);
             String response = messageProducer.sendAnomalyMessage(mp);
             if(response != null) {
                 ObjectMapper om = new ObjectMapper();
