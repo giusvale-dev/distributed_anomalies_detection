@@ -34,12 +34,12 @@ export class MenuBarComponent {
         ]
       },
       {
-        label: 'Hosts',
+        label: 'Anomalies',
         icon: 'pi pi-fw pi-pencil',
         items: [
           {
-            label: 'Manage hosts',
-            routerLink: [''],
+            label: 'Manage Anomalies',
+            routerLink: ['/anomalies'],
             icon: 'pi pi-fw pi-align-left',
           },
         ]

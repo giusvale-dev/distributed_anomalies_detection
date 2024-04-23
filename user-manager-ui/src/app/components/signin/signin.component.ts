@@ -38,7 +38,7 @@ export class SigninComponent {
       
       next: (data: any) => {
         localStorage.setItem('jwt', data.jwt)
-        this.router.navigateByUrl('/users')
+        this.router.navigateByUrl('/anomalies')
       },
       error: (err) => {
         this.showError = true;

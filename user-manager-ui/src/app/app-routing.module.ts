@@ -5,6 +5,7 @@ import { EditUserComponent } from './components/edit-user/edit-user.component';
 import { UsersComponent } from './components/users/users.component';
 import { SigninComponent } from './components/signin/signin.component';
 import { AuthGuard } from './auth/auth.guard';
+import { AnomaliesComponent } from './components/anomalies/anomalies.component';
 
 
 const routes: Routes = [
@@ -12,6 +13,11 @@ const routes: Routes = [
   {
     path: 'signin',
     component: SigninComponent
+  },
+  {
+    path: 'anomalies',
+    component: AnomaliesComponent,
+    canActivate: [AuthGuard]
   },
   {
     path: 'users',

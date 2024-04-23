@@ -29,6 +29,8 @@ import { HeadingPageComponent } from './heading-page/heading-page.component';
 import { ToastModule } from 'primeng/toast';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
+import { AnomaliesComponent } from './components/anomalies/anomalies.component';
+
 
 
 
@@ -43,6 +45,8 @@ import { InputIconModule } from 'primeng/inputicon';
     SigninComponent,
     MenuBarComponent,
     HeadingPageComponent,
+    AnomaliesComponent,
+    
   ],
   imports: [
     BrowserModule,
