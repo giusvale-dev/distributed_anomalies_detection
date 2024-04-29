@@ -12,12 +12,12 @@ Please install in your system the following required dependecies:
 7. install angular16 and cli with: npm install -g @angular/cli@16
 8. run cd distributed_anomalies_detection
 9. run cd user-manager-ui and run command npm install
-10.run cd.. and then ./install_services.py
+10.run cd.. and after that ./install_services.py
 11.install docker 
 12.install docker-compose 
 13.run sudo docker-compose build
 14.run sudo docker.compose up -d
-15.run cd watchdog and then ./deploy.sh to run watchdog agent on your machine
+15.run cd watchdog and after that ./deploy.sh to run watchdog agent on your machine
 ```
 
 
