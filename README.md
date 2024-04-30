@@ -3,7 +3,21 @@
 # Dependencies
 Please install in your system the following required dependecies:
 ```bash
-# Insert here the commands
+1. run sudo apt install git 
+2. clone repository with: git clone https://github.com/giusvale-dev/distributed_anomalies_detection.git
+3. install maven with: sudo apt install maven 
+4. verify Java version, it must be 21
+5. install node and nvm with: install nvm, with wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | 	 bash
+6. install node v16.14.0 with: nvm install v16.14.0
+7. install angular16 and cli with: npm install -g @angular/cli@16
+8. run cd distributed_anomalies_detection
+9. run cd user-manager-ui and run command npm install
+10.run cd.. and after that ./install_services.py
+11.install docker 
+12.install docker-compose 
+13.run sudo docker-compose build
+14.run sudo docker.compose up -d
+15.run cd watchdog and after that ./deploy.sh to run watchdog agent on your machine
 ```
 
 
